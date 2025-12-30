@@ -1,129 +1,163 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>مزرعة الأساطير V3</title>
-    <style>
-        body { 
-            background: #1a3c15; font-family: 'Segoe UI', sans-serif; margin: 0; color: white; 
-            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-        }
-        /* شريط المعلومات العلوي */
-        .top-nav { 
-            background: rgba(0,0,0,0.8); padding: 10px; display: flex; justify-content: space-around;
-            border-bottom: 4px solid #f1c40f; sticky; top: 0; z-index: 100;
-        }
-        .stat { background: #2d5a27; padding: 5px 15px; border-radius: 15px; border: 1px solid #ffd700; }
-
-        /* أرض المزرعة */
-        .farm-land { 
-            width: 360px; height: 500px; margin: 20px auto; 
-            background: url('https://img.freepik.com/free-photo/top-view-grass-background_23-2148139580.jpg') center/cover;
-            border: 12px solid #5d2906; border-radius: 25px; position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        /* قطع الأرض للزراعة */
-        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 15px; padding: 120px 25px; }
-        .plot { 
-            width: 90px; height: 90px; 
-            background: url('https://img.freepik.com/free-photo/brown-soil-texture_23-2148118029.jpg') center/cover;
-            border-radius: 10px; border: 3px solid #3d1c02; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 40px;
-        }
-
-        /* الآلات والمصانع */
-        .machine { position: absolute; width: 70px; height: 70px; cursor: pointer; filter: drop-shadow(2px 2px 5px black); }
-        .tractor { top: 20px; left: 20px; }
-        .factory { top: 20px; right: 20px; }
-
-        /* المتجر السفلي */
-        .footer-shop { 
-            position: fixed; bottom: 0; width: 100%; background: #8e44ad; 
-            padding: 15px; border-top: 5px solid #f1c40f; display: flex; justify-content: center;
-        }
-        .btn-buy { background: #f1c40f; color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مزرعتي الواقعية</title>
+<style>
+body { font-family: Arial, sans-serif; background: #a2d149; margin:0; padding:0; }
+#login, #game { display:none; padding:20px; }
+button { padding:10px 15px; margin:5px; cursor:pointer; }
+#farm { display:grid; grid-template-columns: repeat(5, 60px); grid-gap:5px; margin-top:20px; }
+.tile { width:60px; height:60px; background:#7cfc00; border:1px solid #555; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; text-align:center; }
+#store { display:none; background:#fff; padding:10px; border:1px solid #000; margin-top:10px; }
+#inventory { margin-top:10px; }
+</style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="stat">💰 ذهب: <span id="gold">500</span></div>
-        <div class="stat">⭐ مستوي: <span id="lvl">1</span></div>
-        <div class="stat">📦 مخزن: <span id="inv">0</span></div>
-    </div>
+<div id="login">
+<h2>تسجيل الدخول</h2>
+<input id="username" placeholder="اكتب اسمك"><br>
+<button onclick="login()">دخول</button>
+</div>
 
-    <div class="farm-land">
-        <img src="https://cdn-icons-png.flaticon.com/512/2318/2318256.png" class="machine tractor" title="الجرار" onclick="alert('الجرار يعمل على حرث الأرض!')">
-        <img src="https://cdn-icons-png.flaticon.com/512/2648/2648939.png" class="machine factory" title="المصنع" onclick="useFactory()">
+<div id="game">
+<h2>مرحبًا <span id="playerName"></span></h2>
+<p>الذهب: <span id="gold">0</span></p>
+<button onclick="openStore()">المتجر</button>
+<button onclick="saveGame()">حفظ اللعبة</button>
 
-        <div class="grid">
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-        </div>
-    </div>
+<div id="farm"></div>
 
-    <div class="footer-shop">
-        <button class="btn-buy" onclick="sellItems()">بيع كل المحاصيل في المتجر 🏪</button>
-    </div>
+<div id="store">
+<h3>المتجر</h3>
+<p>الحيوانات:</p>
+<button onclick="buyItem('دجاج',50)">دجاج - 50 ذهب</button>
+<button onclick="buyItem('بقر',200)">بقر - 200 ذهب</button>
+<button onclick="buyItem('غنم',150)">غنم - 150 ذهب</button>
+<button onclick="buyItem('ماعز',120)">ماعز - 120 ذهب</button>
+<button onclick="buyItem('جمل',500)">جمل - 500 ذهب</button>
+<button onclick="buyItem('حصان',400)">حصان - 400 ذهب</button>
+<button onclick="buyItem('كلب',300)">كلب - 300 ذهب</button>
 
-    <script>
-        let gold = 500;
-        let inventory = 0;
-        let level = 1;
+<p>المحاصيل:</p>
+<button onclick="buyItem('طماطم',10)">طماطم - 10 ذهب</button>
+<button onclick="buyItem('بطاطس',10)">بطاطس - 10 ذهب</button>
+<button onclick="buyItem('جزر',10)">جزر - 10 ذهب</button>
+<button onclick="buyItem('باذنجان',10)">باذنجان - 10 ذهب</button>
+<button onclick="buyItem('كوسة',10)">كوسة - 10 ذهب</button>
+<button onclick="buyItem('ذرة',10)">ذرة - 10 ذهب</button>
 
-        function plant(plot) {
-            if (plot.innerHTML === "" && gold >= 20) {
-                gold -= 20;
-                plot.innerHTML = "🌱"; 
-                updateUI();
-                setTimeout(() => {
-                    plot.innerHTML = "🌽";
-                    plot.onclick = () => harvest(plot);
-                }, 3000);
-            }
-        }
+<p>الأشجار:</p>
+<button onclick="buyItem('شجرة تفاح',100)">شجرة تفاح - 100 ذهب</button>
+<button onclick="buyItem('شجرة برتقال',100)">شجرة برتقال - 100 ذهب</button>
+<button onclick="buyItem('شجرة موز',100)">شجرة موز - 100 ذهب</button>
 
-        function harvest(plot) {
-            inventory++;
-            plot.innerHTML = "";
-            plot.onclick = () => plant(plot);
-            updateUI();
-            if (inventory >= 5 && level === 1) {
-                level = 2;
-                alert("تهانينا! صرت في المستوى 2 وفتحت المصنع!");
-            }
-        }
+<p>المصانع:</p>
+<button onclick="buyItem('مصنع ألبان',500)">مصنع ألبان - 500 ذهب</button>
+<button onclick="buyItem('مصنع جبن',500)">مصنع جبن - 500 ذهب</button>
+<button onclick="buyItem('خلية نحل',300)">خلية نحل - 300 ذهب</button>
 
-        function sellItems() {
-            if (inventory > 0) {
-                gold += inventory * 50;
-                inventory = 0;
-                updateUI();
-                alert("بعت المحصول وقبضت الثمن! 💰");
-            }
-        }
+<button onclick="closeStore()">إغلاق المتجر</button>
+</div>
 
-        function useFactory() {
-            if (level >= 2) {
-                alert("المصنع يحول الذرة إلى دقيق.. انتظر التحديث القادم!");
-            } else {
-                alert("يجب أن تصل للمستوى 2 لتشغيل المصنع!");
-            }
-        }
+<div id="inventory">
+<h3>المخزن:</h3>
+<div id="items"></div>
+</div>
 
-        function updateUI() {
-            document.getElementById('gold').innerText = gold;
-            document.getElementById('inv').innerText = inventory;
-            document.getElementById('lvl').innerText = level;
-        }
-    </script>
+</div>
+
+<script>
+// ===== بيانات اللعبة =====
+let player = { name:'', gold:500, farm:Array(25).fill(''), inventory:{} };
+
+// ===== تسجيل الدخول =====
+function login(){
+    const name = document.getElementById('username').value;
+    if(!name) return alert('اكتب اسمك');
+    player.name = name;
+
+    // استعادة اللعبة من LocalStorage
+    const saved = localStorage.getItem('farmGame_' + name);
+    if(saved) player = JSON.parse(saved);
+
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    document.getElementById('playerName').innerText = player.name;
+    document.getElementById('gold').innerText = player.gold;
+    renderFarm();
+    renderInventory();
+}
+
+// ===== المزرعة =====
+function renderFarm(){
+    const farmDiv = document.getElementById('farm');
+    farmDiv.innerHTML = '';
+    for(let i=0;i<25;i++){
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerText = player.farm[i] ? player.farm[i] : '';
+        tile.onclick = () => plantOrHarvest(i);
+        farmDiv.appendChild(tile);
+    }
+}
+
+// زرع أو حصاد المحاصيل
+function plantOrHarvest(i){
+    if(player.farm[i]){
+        alert('تم حصاد: ' + player.farm[i]);
+        player.gold += 20; // ربح من المحصول
+        player.farm[i]='';
+        renderFarm();
+        document.getElementById('gold').innerText = player.gold;
+    } else {
+        const crop = prompt('اختر محصول للزرع: طماطم، بطاطس، جزر، باذنجان، كوسة، ذرة');
+        if(crop && player.inventory[crop]>0){
+            player.farm[i] = crop;
+            player.inventory[crop]--;
+            renderFarm();
+            renderInventory();
+        } else alert('المحصول غير متوفر في المخزن');
+    }
+}
+
+// ===== المتجر =====
+function openStore(){ document.getElementById('store').style.display='block'; }
+function closeStore(){ document.getElementById('store').style.display='none'; }
+
+function buyItem(name, price){
+    if(player.gold >= price){
+        player.gold -= price;
+        if(!player.inventory[name]) player.inventory[name]=0;
+        player.inventory[name]++;
+        document.getElementById('gold').innerText = player.gold;
+        renderInventory();
+        alert('تم شراء '+name);
+    } else alert('لا يوجد ذهب كافي');
+}
+
+// ===== المخزن =====
+function renderInventory(){
+    const itemsDiv = document.getElementById('items');
+    itemsDiv.innerHTML = '';
+    for(let key in player.inventory){
+        itemsDiv.innerHTML += key + ' : ' + player.inventory[key] + '<br>';
+    }
+}
+
+// ===== حفظ اللعبة تلقائيًا =====
+function saveGame(){
+    localStorage.setItem('farmGame_' + player.name, JSON.stringify(player));
+    alert('تم حفظ اللعبة!');
+}
+
+// حفظ تلقائي كل دقيقة
+setInterval(() => {
+    if(player.name) saveGame();
+}, 60000);
+</script>
+
 </body>
-    </html>
+</html>
