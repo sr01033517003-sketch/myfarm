@@ -6,7 +6,7 @@
 <title>مزرعتي الواقعية</title>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
 <style>
-body { margin:0; padding:0; font-family: Arial; background:#a2d149; }
+body { margin:0; padding:0; font-family: Arial; background:#6ab04c; }
 #game-container { width:100%; height:100vh; }
 #ui { position:absolute; top:10px; left:10px; color:#fff; z-index:10; }
 button { padding:5px 10px; margin:2px; cursor:pointer; }
@@ -29,12 +29,10 @@ button { padding:5px 10px; margin:2px; cursor:pointer; }
 </div>
 
 <script>
-// ===== بيانات اللاعب =====
-let playerData = { 
-    gold:500, level:1, experience:0, inventory:{}, farm:[] 
-};
+// بيانات اللاعب
+let playerData = { gold:500, level:1, experience:0, inventory:{}, farm:[] };
 
-// ===== إعداد Phaser =====
+// إعداد Phaser
 const config = {
     type: Phaser.AUTO,
     width: 600,
@@ -48,18 +46,25 @@ let farmTiles = [];
 
 function preload() {
     // تحميل الصور
-    this.load.image('dirt','https://i.imgur.com/8Y3Q5Bf.png');
-    this.load.image('grass','https://i.imgur.com/JlZx1ZV.png');
+    this.load.image('grass','https://i.imgur.com/JlZx1ZV.png'); // العشب
+    this.load.image('dirt','https://i.imgur.com/4p0u7TG.png'); // تربة طينية واقعية
     this.load.spritesheet('chicken','https://i.imgur.com/KhH1F4M.png',{ frameWidth:32, frameHeight:32 });
     this.load.spritesheet('cow','https://i.imgur.com/3pXvRSR.png',{ frameWidth:32, frameHeight:32 });
     this.load.image('tomato','https://i.imgur.com/YJ2RslQ.png');
 }
 
 function create() {
-    // إنشاء مزرعة 5x5 واضحة من البداية
+    // إنشاء مزرعة 5x5 مربعات تربة
+    let startX = 80, startY = 60;
+    let tileWidth = 80, tileHeight = 50;
     for(let y=0;y<5;y++){
         for(let x=0;x<5;x++){
-            let tile = this.add.image(50 + x*100, 50 + y*70, 'dirt').setInteractive();
+            // خريطة العشب خلف التربة
+            this.add.image(startX + x*tileWidth, startY + y*tileHeight, 'grass').setScale(1.2);
+            // التربة الطينية
+            let tile = this.add.image(startX + x*tileWidth, startY + y*tileHeight, 'dirt').setInteractive();
+            tile.displayWidth = tileWidth - 4; // جعلها تبدو مثل أرض الزراعة
+            tile.displayHeight = tileHeight - 4;
             tile.on('pointerdown', ()=>plantCrop(tile,x + y*5));
             farmTiles.push({sprite:tile, crop:null});
         }
@@ -67,13 +72,13 @@ function create() {
 
     // وضع بعض المحاصيل الافتراضية (طماطم)
     for(let i=0;i<5;i++){
-        let cropSprite = this.add.image(farmTiles[i].sprite.x, farmTiles[i].sprite.y-20,'tomato');
+        let cropSprite = this.add.image(farmTiles[i].sprite.x, farmTiles[i].sprite.y-15,'tomato').setScale(0.8);
         farmTiles[i].crop = cropSprite;
     }
 
     // الحيوانات المتحركة
-    this.chicken = this.add.sprite(400,100,'chicken').play('walkChicken');
-    this.cow = this.add.sprite(500,200,'cow').play('walkCow');
+    this.chicken = this.add.sprite(450,100,'chicken').play('walkChicken');
+    this.cow = this.add.sprite(520,200,'cow').play('walkCow');
 
     this.anims.create({key:'walkChicken', frames:this.anims.generateFrameNumbers('chicken',{start:0,end:3}), frameRate:4, repeat:-1});
     this.anims.create({key:'walkCow', frames:this.anims.generateFrameNumbers('cow',{start:0,end:3}), frameRate:2, repeat:-1});
@@ -84,12 +89,12 @@ function create() {
     updateUI();
 }
 
-// زرع وحصاد المحاصيل
+// زرع المحاصيل
 function plantCrop(tile,index){
     const crop = prompt('اختر محصول للزرع: طماطم');
     if(crop==='طماطم'){
         if(farmTiles[index].crop) return alert('يوجد محصول هنا!');
-        let cropSprite = game.scene.scenes[0].add.image(tile.x, tile.y-20,'tomato');
+        let cropSprite = game.scene.scenes[0].add.image(tile.x, tile.y-15,'tomato').setScale(0.8);
         farmTiles[index].crop = cropSprite;
         playerData.experience += 10;
         playerData.gold += 20;
@@ -141,5 +146,4 @@ setInterval(()=>{ saveGame(); },60000);
 function update(){}
 </script>
 </body>
-    </html>
-    
+</html>
