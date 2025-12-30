@@ -2,114 +2,128 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعتي المتطورة</title>
+    <title>مزرعة الأساطير V3</title>
     <style>
-        body { background: #2d5a27; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
-        .header { background: rgba(0,0,0,0.6); color: white; width: 100%; text-align: center; padding: 10px; border-bottom: 5px solid #ffd700; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
-        /* خريطة المزرعة */
-        .farm-world { 
-            position: relative; width: 360px; height: 450px; 
-            background: #7cfc00; border: 12px solid #5d2906; 
-            border-radius: 20px; margin: 20px;
-            background-image: radial-gradient(#a2e05d 10%, transparent 20%), radial-gradient(#a2e05d 10%, transparent 20%);
-            background-position: 0 0, 15px 15px; background-size: 30px 30px;
+        body { 
+            background: #1a3c15; font-family: 'Segoe UI', sans-serif; margin: 0; color: white; 
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+        }
+        /* شريط المعلومات العلوي */
+        .top-nav { 
+            background: rgba(0,0,0,0.8); padding: 10px; display: flex; justify-content: space-around;
+            border-bottom: 4px solid #f1c40f; sticky; top: 0; z-index: 100;
+        }
+        .stat { background: #2d5a27; padding: 5px 15px; border-radius: 15px; border: 1px solid #ffd700; }
+
+        /* أرض المزرعة */
+        .farm-land { 
+            width: 360px; height: 500px; margin: 20px auto; 
+            background: url('https://img.freepik.com/free-photo/top-view-grass-background_23-2148139580.jpg') center/cover;
+            border: 12px solid #5d2906; border-radius: 25px; position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        /* المباني والأشجار الثابتة */
-        .house { position: absolute; top: 10px; left: 10px; font-size: 50px; z-index: 5; }
-        .barn { position: absolute; top: 10px; right: 10px; font-size: 50px; z-index: 5; }
-        .tree { position: absolute; font-size: 30px; filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.3)); }
-
-        /* قطع الأرض المقسمة */
-        .grid { 
-            display: grid; grid-template-columns: repeat(3, 80px); grid-gap: 10px; 
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-        }
+        /* قطع الأرض للزراعة */
+        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 15px; padding: 120px 25px; }
         .plot { 
-            width: 80px; height: 80px; background: #8b4513; border: 3px solid #5d2906;
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 35px; cursor: pointer; transition: 0.2s;
+            width: 90px; height: 90px; 
+            background: url('https://img.freepik.com/free-photo/brown-soil-texture_23-2148118029.jpg') center/cover;
+            border-radius: 10px; border: 3px solid #3d1c02; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 40px;
         }
-        .plot:active { transform: scale(0.9); }
 
-        /* الحيوانات المتحركة */
-        .animal { position: absolute; font-size: 30px; transition: all 2s linear; z-index: 10; }
+        /* الآلات والمصانع */
+        .machine { position: absolute; width: 70px; height: 70px; cursor: pointer; filter: drop-shadow(2px 2px 5px black); }
+        .tractor { top: 20px; left: 20px; }
+        .factory { top: 20px; right: 20px; }
 
-        .stats { background: white; padding: 15px; border-radius: 50px; border: 3px solid #ffd700; margin-top: 10px; font-weight: bold; font-size: 20px; }
-        .instructions { color: white; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 10px; margin-top: 10px; }
+        /* المتجر السفلي */
+        .footer-shop { 
+            position: fixed; bottom: 0; width: 100%; background: #8e44ad; 
+            padding: 15px; border-top: 5px solid #f1c40f; display: flex; justify-content: center;
+        }
+        .btn-buy { background: #f1c40f; color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🏡 مزرعتي الكبيرة 🚜</h1>
+    <div class="top-nav">
+        <div class="stat">💰 ذهب: <span id="gold">500</span></div>
+        <div class="stat">⭐ مستوي: <span id="lvl">1</span></div>
+        <div class="stat">📦 مخزن: <span id="inv">0</span></div>
     </div>
 
-    <div class="stats">💰 الذهب: <span id="gold">200</span></div>
-
-    <div class="farm-world">
-        <div class="house">🏠</div>
-        <div class="barn">🏘️</div>
-        <div class="tree" style="top:80px; left:20px;">🌳</div>
-        <div class="tree" style="top:80px; right:20px;">🌳</div>
-        <div class="tree" style="top:150px; left:5px;">🌲</div>
-        <div class="tree" style="top:150px; right:5px;">🌲</div>
-
-        <div id="cow" class="animal" style="top:100px; left:150px;">🐄</div>
-        <div id="chicken" class="animal" style="top:180px; left:100px;">🐓</div>
+    <div class="farm-land">
+        <img src="https://cdn-icons-png.flaticon.com/512/2318/2318256.png" class="machine tractor" title="الجرار" onclick="alert('الجرار يعمل على حرث الأرض!')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2648/2648939.png" class="machine factory" title="المصنع" onclick="useFactory()">
 
         <div class="grid">
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
+            <div class="plot" onclick="plant(this)"></div>
         </div>
     </div>
 
-    <div class="instructions">اضغط على المربعات البنية لزراعة المحاصيل 🌱</div>
+    <div class="footer-shop">
+        <button class="btn-buy" onclick="sellItems()">بيع كل المحاصيل في المتجر 🏪</button>
+    </div>
 
     <script>
-        let gold = 200;
-        const crops = ['🌽', '🥕', '🍅', '🌻', '🍓'];
+        let gold = 500;
+        let inventory = 0;
+        let level = 1;
 
-        function plant(el) {
-            if (el.innerText === '🟫' && gold >= 20) {
+        function plant(plot) {
+            if (plot.innerHTML === "" && gold >= 20) {
                 gold -= 20;
-                updateGold();
-                let crop = crops[Math.floor(Math.random() * crops.length)];
-                el.innerText = '🌱'; // مرحلة النمو
-                el.style.background = '#5d2906';
-                
+                plot.innerHTML = "🌱"; 
+                updateUI();
                 setTimeout(() => {
-                    el.innerText = crop; // نضج المحصول
-                    el.style.background = '#8b4513';
-                    
-                    setTimeout(() => {
-                        el.innerText = '🟫'; // حصد تلقائي
-                        gold += 50;
-                        updateGold();
-                    }, 3000);
-                }, 2000);
+                    plot.innerHTML = "🌽";
+                    plot.onclick = () => harvest(plot);
+                }, 3000);
             }
         }
 
-        function updateGold() {
-            document.getElementById('gold').innerText = gold;
+        function harvest(plot) {
+            inventory++;
+            plot.innerHTML = "";
+            plot.onclick = () => plant(plot);
+            updateUI();
+            if (inventory >= 5 && level === 1) {
+                level = 2;
+                alert("تهانينا! صرت في المستوى 2 وفتحت المصنع!");
+            }
         }
 
-        // تحريك الحيوانات لإعطاء حياة للمزرعة
-        function moveAnimals() {
-            const cow = document.getElementById('cow');
-            const chicken = document.getElementById('chicken');
-            cow.style.top = Math.random() * 150 + 50 + 'px';
-            cow.style.left = Math.random() * 250 + 50 + 'px';
-            chicken.style.top = Math.random() * 150 + 50 + 'px';
-            chicken.style.left = Math.random() * 250 + 50 + 'px';
+        function sellItems() {
+            if (inventory > 0) {
+                gold += inventory * 50;
+                inventory = 0;
+                updateUI();
+                alert("بعت المحصول وقبضت الثمن! 💰");
+            }
         }
-        setInterval(moveAnimals, 3000);
+
+        function useFactory() {
+            if (level >= 2) {
+                alert("المصنع يحول الذرة إلى دقيق.. انتظر التحديث القادم!");
+            } else {
+                alert("يجب أن تصل للمستوى 2 لتشغيل المصنع!");
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('gold').innerText = gold;
+            document.getElementById('inv').innerText = inventory;
+            document.getElementById('lvl').innerText = level;
+        }
     </script>
 </body>
-</html>
+    </html>
