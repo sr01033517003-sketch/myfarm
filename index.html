@@ -4,38 +4,62 @@
     <meta charset="UTF-8">
     <title>مزرعتي المتطورة</title>
     <style>
-        :root { --grass: #7cfc00; --dirt: #8b4513; --tree: #228b22; }
-        body { background-color: var(--tree); font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
-        h1 { color: white; text-shadow: 2px 2px 4px #000; }
+        body { background: #2d5a27; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
+        .header { background: rgba(0,0,0,0.6); color: white; width: 100%; text-align: center; padding: 10px; border-bottom: 5px solid #ffd700; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
-        /* إطار المزرعة والأشجار */
-        .world { background: var(--grass); padding: 40px; border: 15px solid #5d2906; border-radius: 50px; box-shadow: 0 0 50px rgba(0,0,0,0.5); position: relative; }
-        .tree-decoration { position: absolute; font-size: 30px; }
+        /* خريطة المزرعة */
+        .farm-world { 
+            position: relative; width: 360px; height: 450px; 
+            background: #7cfc00; border: 12px solid #5d2906; 
+            border-radius: 20px; margin: 20px;
+            background-image: radial-gradient(#a2e05d 10%, transparent 20%), radial-gradient(#a2e05d 10%, transparent 20%);
+            background-position: 0 0, 15px 15px; background-size: 30px 30px;
+        }
 
-        /* تقسيم الأرض */
-        .farm-grid { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 10px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; }
-        .plot { width: 100px; height: 100px; background: var(--dirt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; transition: 0.3s; border: 2px solid #5d2906; }
-        .plot:hover { transform: scale(1.05); background: #a0522d; }
+        /* المباني والأشجار الثابتة */
+        .house { position: absolute; top: 10px; left: 10px; font-size: 50px; z-index: 5; }
+        .barn { position: absolute; top: 10px; right: 10px; font-size: 50px; z-index: 5; }
+        .tree { position: absolute; font-size: 30px; filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.3)); }
 
-        .controls { margin-top: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .gold-display { font-size: 24px; font-weight: bold; color: #d4af37; margin-bottom: 10px; }
-        button { padding: 10px 20px; font-size: 16px; border: none; border-radius: 10px; background: #2ecc71; color: white; cursor: pointer; font-weight: bold; }
+        /* قطع الأرض المقسمة */
+        .grid { 
+            display: grid; grid-template-columns: repeat(3, 80px); grid-gap: 10px; 
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+        }
+        .plot { 
+            width: 80px; height: 80px; background: #8b4513; border: 3px solid #5d2906;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 35px; cursor: pointer; transition: 0.2s;
+        }
+        .plot:active { transform: scale(0.9); }
+
+        /* الحيوانات المتحركة */
+        .animal { position: absolute; font-size: 30px; transition: all 2s linear; z-index: 10; }
+
+        .stats { background: white; padding: 15px; border-radius: 50px; border: 3px solid #ffd700; margin-top: 10px; font-weight: bold; font-size: 20px; }
+        .instructions { color: white; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>🌳 مزرعتي الجميلة 🌳</h1>
+    <div class="header">
+        <h1>🏡 مزرعتي الكبيرة 🚜</h1>
+    </div>
 
-    <div class="world">
-        <div style="top:-30px; left:50%;" class="tree-decoration">🌳🌳🌳</div>
-        <div style="bottom:-30px; left:50%;" class="tree-decoration">🌳🌳🌳</div>
-        <div style="left:-30px; top:50%; writing-mode: vertical-rl;" class="tree-decoration">🌳🌳🌳</div>
-        <div style="right:-30px; top:50%; writing-mode: vertical-rl;" class="tree-decoration">🌳🌳🌳</div>
+    <div class="stats">💰 الذهب: <span id="gold">200</span></div>
 
-        <div class="farm-grid">
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
-            <div class="plot" onclick="plant(this)">🟫</div>
+    <div class="farm-world">
+        <div class="house">🏠</div>
+        <div class="barn">🏘️</div>
+        <div class="tree" style="top:80px; left:20px;">🌳</div>
+        <div class="tree" style="top:80px; right:20px;">🌳</div>
+        <div class="tree" style="top:150px; left:5px;">🌲</div>
+        <div class="tree" style="top:150px; right:5px;">🌲</div>
+
+        <div id="cow" class="animal" style="top:100px; left:150px;">🐄</div>
+        <div id="chicken" class="animal" style="top:180px; left:100px;">🐓</div>
+
+        <div class="grid">
             <div class="plot" onclick="plant(this)">🟫</div>
             <div class="plot" onclick="plant(this)">🟫</div>
             <div class="plot" onclick="plant(this)">🟫</div>
@@ -45,34 +69,47 @@
         </div>
     </div>
 
-    <div class="controls">
-        <div class="gold-display">💰 الذهب: <span id="gold">100</span></div>
-        <p>اضغط على أي قطعة أرض لزراعتها (تكلفة الزرعة 10 ذهب)</p>
-    </div>
+    <div class="instructions">اضغط على المربعات البنية لزراعة المحاصيل 🌱</div>
 
     <script>
-        let gold = 100;
-        const plants = ['🌽', '🥕', '🍅', '🌻'];
+        let gold = 200;
+        const crops = ['🌽', '🥕', '🍅', '🌻', '🍓'];
 
-        function plant(element) {
-            if (gold >= 10) {
-                if (element.innerText === '🟫') {
-                    gold -= 10;
-                    document.getElementById('gold').innerText = gold;
-                    let randomPlant = plants[Math.floor(Math.random() * plants.length)];
-                    element.innerText = randomPlant;
+        function plant(el) {
+            if (el.innerText === '🟫' && gold >= 20) {
+                gold -= 20;
+                updateGold();
+                let crop = crops[Math.floor(Math.random() * crops.length)];
+                el.innerText = '🌱'; // مرحلة النمو
+                el.style.background = '#5d2906';
+                
+                setTimeout(() => {
+                    el.innerText = crop; // نضج المحصول
+                    el.style.background = '#8b4513';
                     
-                    // بعد 5 ثواني نحصد ونكسب ذهب
                     setTimeout(() => {
-                        element.innerText = '🟫';
-                        gold += 25;
-                        document.getElementById('gold').innerText = gold;
-                    }, 5000);
-                }
-            } else {
-                alert("الذهب لا يكفي!");
+                        el.innerText = '🟫'; // حصد تلقائي
+                        gold += 50;
+                        updateGold();
+                    }, 3000);
+                }, 2000);
             }
         }
+
+        function updateGold() {
+            document.getElementById('gold').innerText = gold;
+        }
+
+        // تحريك الحيوانات لإعطاء حياة للمزرعة
+        function moveAnimals() {
+            const cow = document.getElementById('cow');
+            const chicken = document.getElementById('chicken');
+            cow.style.top = Math.random() * 150 + 50 + 'px';
+            cow.style.left = Math.random() * 250 + 50 + 'px';
+            chicken.style.top = Math.random() * 150 + 50 + 'px';
+            chicken.style.left = Math.random() * 250 + 50 + 'px';
+        }
+        setInterval(moveAnimals, 3000);
     </script>
 </body>
 </html>
