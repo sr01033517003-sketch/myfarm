@@ -2,128 +2,154 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعة الأساطير V3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزرعة الأساطير الحقيقية</title>
     <style>
-        body { 
-            background: #1a3c15; font-family: 'Segoe UI', sans-serif; margin: 0; color: white; 
-            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-        }
-        /* شريط المعلومات العلوي */
-        .top-nav { 
-            background: rgba(0,0,0,0.8); padding: 10px; display: flex; justify-content: space-around;
-            border-bottom: 4px solid #f1c40f; sticky; top: 0; z-index: 100;
-        }
-        .stat { background: #2d5a27; padding: 5px 15px; border-radius: 15px; border: 1px solid #ffd700; }
+        :root { --gold: #ffd700; --grass: #4caf50; --dirt: #795548; }
+        body { background: #1b5e20; font-family: 'Segoe UI', Tahoma; color: white; margin: 0; text-align: center; }
+        
+        /* واجهة التسجيل */
+        #auth-screen { background: rgba(0,0,0,0.9); position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        input { padding: 12px; margin: 10px; border-radius: 8px; border: none; width: 250px; }
 
+        /* رأس اللعبة */
+        .header { background: #2e7d32; padding: 15px; display: flex; justify-content: space-around; border-bottom: 4px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        
         /* أرض المزرعة */
-        .farm-land { 
-            width: 360px; height: 500px; margin: 20px auto; 
-            background: url('https://img.freepik.com/free-photo/top-view-grass-background_23-2148139580.jpg') center/cover;
-            border: 12px solid #5d2906; border-radius: 25px; position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
+        .farm-grid { display: grid; grid-template-columns: repeat(4, 80px); gap: 10px; justify-content: center; padding: 20px; background: var(--grass); border: 10px solid #3e2723; border-radius: 20px; width: fit-content; margin: 20px auto; }
+        .plot { width: 80px; height: 80px; background: var(--dirt); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; border: 2px solid #3d1c02; }
 
-        /* قطع الأرض للزراعة */
-        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 15px; padding: 120px 25px; }
-        .plot { 
-            width: 90px; height: 90px; 
-            background: url('https://img.freepik.com/free-photo/brown-soil-texture_23-2148118029.jpg') center/cover;
-            border-radius: 10px; border: 3px solid #3d1c02; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 40px;
-        }
-
-        /* الآلات والمصانع */
-        .machine { position: absolute; width: 70px; height: 70px; cursor: pointer; filter: drop-shadow(2px 2px 5px black); }
-        .tractor { top: 20px; left: 20px; }
-        .factory { top: 20px; right: 20px; }
-
-        /* المتجر السفلي */
-        .footer-shop { 
-            position: fixed; bottom: 0; width: 100%; background: #8e44ad; 
-            padding: 15px; border-top: 5px solid #f1c40f; display: flex; justify-content: center;
-        }
-        .btn-buy { background: #f1c40f; color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* القوائم الجانبية (المتجر والمخزن) */
+        .panel { background: white; color: black; margin: 10px; padding: 15px; border-radius: 15px; max-height: 300px; overflow-y: auto; }
+        .item-card { display: inline-block; border: 1px solid #ddd; padding: 10px; margin: 5px; border-radius: 10px; width: 100px; }
+        button { cursor: pointer; background: #e67e22; color: white; border: none; padding: 8px; border-radius: 5px; font-weight: bold; }
+        
+        .hidden { display: none !important; }
+        .animal-area { font-size: 40px; margin: 20px; min-height: 50px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="stat">💰 ذهب: <span id="gold">500</span></div>
-        <div class="stat">⭐ مستوي: <span id="lvl">1</span></div>
-        <div class="stat">📦 مخزن: <span id="inv">0</span></div>
+    <div id="auth-screen">
+        <h1>🌾 مرحبا بك في المزرعة السعيدة 🌾</h1>
+        <input type="text" id="username" placeholder="ادخل اسمك هنا...">
+        <button onclick="login()" style="font-size: 20px; padding: 10px 40px;">دخول المزرعة</button>
     </div>
 
-    <div class="farm-land">
-        <img src="https://cdn-icons-png.flaticon.com/512/2318/2318256.png" class="machine tractor" title="الجرار" onclick="alert('الجرار يعمل على حرث الأرض!')">
-        <img src="https://cdn-icons-png.flaticon.com/512/2648/2648939.png" class="machine factory" title="المصنع" onclick="useFactory()">
+    <div id="game-ui" class="hidden">
+        <div class="header">
+            <div>👤 <span id="display-name"></span></div>
+            <div>💰 ذهب: <span id="gold">1000</span></div>
+            <div>⭐ مستوى: <span id="lvl">1</span></div>
+            <button onclick="logout()" style="background:red">خروج</button>
+        </div>
 
-        <div class="grid">
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
-            <div class="plot" onclick="plant(this)"></div>
+        <div class="animal-area" id="animal-zone">
+            🏠 الحظيرة: 
+        </div>
+
+        <div class="farm-grid" id="farm">
+            <div class="plot" onclick="work(this)"></div><div class="plot" onclick="work(this)"></div>
+            <div class="plot" onclick="work(this)"></div><div class="plot" onclick="work(this)"></div>
+            <div class="plot" onclick="work(this)"></div><div class="plot" onclick="work(this)"></div>
+            <div class="plot" onclick="work(this)"></div><div class="plot" onclick="work(this)"></div>
+        </div>
+
+        <div class="panel">
+            <h3>🛒 المتجر الشامل (حيوانات، محاصيل، أشجار، آلات)</h3>
+            <div id="shop">
+                <div class="item-card">🐥 دجاجة<br>50💰<br><button onclick="buy('🐥', 50, 'animal')">شراء</button></div>
+                <div class="item-card">🐄 بقرة<br>200💰<br><button onclick="buy('🐄', 200, 'animal')">شراء</button></div>
+                <div class="item-card">🐎 حصان<br>500💰<br><button onclick="buy('🐎', 500, 'animal')">شراء</button></div>
+                <div class="item-card">🐕 كلب شرس<br>300💰<br><button onclick="buy('🐕', 300, 'animal')">شراء</button></div>
+                <div class="item-card">🍎 شجر تفاح<br>150💰<br><button onclick="buy('🍎', 150, 'tree')">شراء</button></div>
+                <div class="item-card">🍌 شجر موز<br>150💰<br><button onclick="buy('🍌', 150, 'tree')">شراء</button></div>
+                <div class="item-card">🚜 جرار<br>1000💰<br><button onclick="buy('🚜', 1000, 'machine')">شراء</button></div>
+            </div>
+        </div>
+
+        <div class="panel" style="background: #fff3e0;">
+            <h3>📦 المخزن الخاص بك</h3>
+            <div id="inventory-list">فارغ</div>
+            <button onclick="sellAll()" style="background:#2ecc71; margin-top:10px;">بيع كل المحصول في المخزن</button>
         </div>
     </div>
 
-    <div class="footer-shop">
-        <button class="btn-buy" onclick="sellItems()">بيع كل المحاصيل في المتجر 🏪</button>
-    </div>
-
     <script>
-        let gold = 500;
-        let inventory = 0;
-        let level = 1;
+        let userData = { name: "", gold: 1000, lvl: 1, inventory: 0, animals: [], trees: [] };
 
-        function plant(plot) {
-            if (plot.innerHTML === "" && gold >= 20) {
-                gold -= 20;
-                plot.innerHTML = "🌱"; 
+        // تسجيل الدخول وحفظ البيانات
+        function login() {
+            let user = document.getElementById('username').value;
+            if(!user) return alert("اكتب اسمك الأول!");
+            
+            // محاولة استعادة البيانات المحفوظة
+            let saved = localStorage.getItem('farm_' + user);
+            if(saved) {
+                userData = JSON.parse(saved);
+            } else {
+                userData.name = user;
+            }
+            
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('hidden');
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('display-name').innerText = userData.name;
+            document.getElementById('gold').innerText = userData.gold;
+            document.getElementById('lvl').innerText = userData.lvl;
+            document.getElementById('inv').innerText = userData.inventory;
+            document.getElementById('inventory-list').innerText = "محاصيل جاهزة للبيع: " + userData.inventory;
+            
+            // عرض الحيوانات
+            let zone = document.getElementById('animal-zone');
+            zone.innerHTML = "🏠 الحظيرة: " + (userData.animals.join(" ") || "لا يوجد حيوانات");
+            
+            // حفظ البيانات تلقائياً في كل مرة
+            localStorage.setItem('farm_' + userData.name, JSON.stringify(userData));
+        }
+
+        function buy(item, price, type) {
+            if(userData.gold >= price) {
+                userData.gold -= price;
+                if(type === 'animal') userData.animals.push(item);
+                if(type === 'tree') userData.animals.push(item); // نضعها في الحظيرة حالياً للتبسيط
                 updateUI();
+                alert("مبروك شراء " + item);
+            } else {
+                alert("الذهب لا يكفي! اشحن أو ازرع لتحصل على المال.");
+            }
+        }
+
+        function work(plot) {
+            if(plot.innerHTML === "") {
+                plot.innerHTML = "🌱";
                 setTimeout(() => {
                     plot.innerHTML = "🌽";
-                    plot.onclick = () => harvest(plot);
+                    plot.onclick = () => {
+                        userData.inventory++;
+                        plot.innerHTML = "";
+                        plot.onclick = () => work(plot);
+                        updateUI();
+                    };
                 }, 3000);
             }
         }
 
-        function harvest(plot) {
-            inventory++;
-            plot.innerHTML = "";
-            plot.onclick = () => plant(plot);
-            updateUI();
-            if (inventory >= 5 && level === 1) {
-                level = 2;
-                alert("تهانينا! صرت في المستوى 2 وفتحت المصنع!");
-            }
-        }
-
-        function sellItems() {
-            if (inventory > 0) {
-                gold += inventory * 50;
-                inventory = 0;
+        function sellAll() {
+            if(userData.inventory > 0) {
+                userData.gold += userData.inventory * 100;
+                userData.inventory = 0;
                 updateUI();
-                alert("بعت المحصول وقبضت الثمن! 💰");
+                alert("تم بيع المحصول وزيادة الذهب!");
             }
         }
 
-        function useFactory() {
-            if (level >= 2) {
-                alert("المصنع يحول الذرة إلى دقيق.. انتظر التحديث القادم!");
-            } else {
-                alert("يجب أن تصل للمستوى 2 لتشغيل المصنع!");
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('gold').innerText = gold;
-            document.getElementById('inv').innerText = inventory;
-            document.getElementById('lvl').innerText = level;
+        function logout() {
+            location.reload();
         }
     </script>
 </body>
-</html>
+    </html>
