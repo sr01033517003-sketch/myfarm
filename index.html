@@ -21,31 +21,9 @@ button { padding:5px 10px; margin:2px; cursor:pointer; }
 <button onclick="saveGame()">حفظ اللعبة</button>
 <div id="store">
 <h4>المتجر</h4>
-<!-- الحيوانات -->
 <button onclick="buyItem('دجاج',50)">دجاج - 50 ذهب</button>
 <button onclick="buyItem('بقر',200)">بقر - 200 ذهب</button>
-<button onclick="buyItem('غنم',150)">غنم - 150 ذهب</button>
-<button onclick="buyItem('ماعز',120)">ماعز - 120 ذهب</button>
-<button onclick="buyItem('جمل',500)">جمل - 500 ذهب</button>
-<button onclick="buyItem('حصان',400)">حصان - 400 ذهب</button>
-<button onclick="buyItem('كلب',300)">كلب - 300 ذهب</button>
-<!-- المحاصيل -->
 <button onclick="buyItem('طماطم',10)">طماطم - 10 ذهب</button>
-<button onclick="buyItem('بطاطس',10)">بطاطس - 10 ذهب</button>
-<button onclick="buyItem('جزر',10)">جزر - 10 ذهب</button>
-<button onclick="buyItem('باذنجان',10)">باذنجان - 10 ذهب</button>
-<button onclick="buyItem('كوسة',10)">كوسة - 10 ذهب</button>
-<button onclick="buyItem('ذرة',10)">ذرة - 10 ذهب</button>
-<!-- الأشجار -->
-<button onclick="buyItem('شجرة تفاح',100)">شجرة تفاح - 100 ذهب</button>
-<button onclick="buyItem('شجرة برتقال',100)">شجرة برتقال - 100 ذهب</button>
-<button onclick="buyItem('شجرة موز',100)">شجرة موز - 100 ذهب</button>
-<button onclick="buyItem('شجرة جوافة',100)">شجرة جوافة - 100 ذهب</button>
-<button onclick="buyItem('شجرة مانجا',100)">شجرة مانجا - 100 ذهب</button>
-<!-- المصانع -->
-<button onclick="buyItem('مصنع ألبان',500)">مصنع ألبان - 500 ذهب</button>
-<button onclick="buyItem('مصنع جبن',500)">مصنع جبن - 500 ذهب</button>
-<button onclick="buyItem('خلية نحل',300)">خلية نحل - 300 ذهب</button>
 <button onclick="closeStore()">إغلاق المتجر</button>
 </div>
 </div>
@@ -72,21 +50,25 @@ function preload() {
     // تحميل الصور
     this.load.image('dirt','https://i.imgur.com/8Y3Q5Bf.png');
     this.load.image('grass','https://i.imgur.com/JlZx1ZV.png');
-    // الحيوانات
     this.load.spritesheet('chicken','https://i.imgur.com/KhH1F4M.png',{ frameWidth:32, frameHeight:32 });
     this.load.spritesheet('cow','https://i.imgur.com/3pXvRSR.png',{ frameWidth:32, frameHeight:32 });
-    // المحاصيل
     this.load.image('tomato','https://i.imgur.com/YJ2RslQ.png');
 }
 
 function create() {
-    // إنشاء مزرعة 5x5
+    // إنشاء مزرعة 5x5 واضحة من البداية
     for(let y=0;y<5;y++){
         for(let x=0;x<5;x++){
             let tile = this.add.image(50 + x*100, 50 + y*70, 'dirt').setInteractive();
             tile.on('pointerdown', ()=>plantCrop(tile,x + y*5));
             farmTiles.push({sprite:tile, crop:null});
         }
+    }
+
+    // وضع بعض المحاصيل الافتراضية (طماطم)
+    for(let i=0;i<5;i++){
+        let cropSprite = this.add.image(farmTiles[i].sprite.x, farmTiles[i].sprite.y-20,'tomato');
+        farmTiles[i].crop = cropSprite;
     }
 
     // الحيوانات المتحركة
@@ -159,4 +141,5 @@ setInterval(()=>{ saveGame(); },60000);
 function update(){}
 </script>
 </body>
-</html>
+    </html>
+    
