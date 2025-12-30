@@ -3,147 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مزرعتي الواقعية</title>
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+<title>مزرعتي الحقيقية</title>
+
 <style>
-body { margin:0; padding:0; font-family: Arial; background:#6ab04c; }
-#game-container { width:100%; height:100vh; }
-#ui { position:absolute; top:10px; left:10px; color:#fff; z-index:10; }
-button { padding:5px 10px; margin:2px; cursor:pointer; }
-#store { display:none; background:#fff; color:#000; padding:5px; margin-top:5px; position:absolute; top:50px; left:10px; z-index:10; }
+body{
+  margin:0;
+  font-family:Arial;
+  background:#5fa55a;
+  text-align:center;
+}
+
+/* الشريط العلوي */
+#top{
+  background:#2e7d32;
+  color:white;
+  padding:10px;
+  font-size:18px;
+}
+
+/* المزرعة */
+#farm{
+  display:grid;
+  grid-template-columns: repeat(5, 60px);
+  gap:8px;
+  justify-content:center;
+  margin:20px auto;
+}
+
+/* قطع الأرض */
+.plot{
+  width:60px;
+  height:60px;
+  background:#6b4f2c; /* تربة طينية */
+  border:2px solid #3a2a18;
+  cursor:pointer;
+}
+.plot.seed{ background:#7a5c35; }
+.plot.grow{ background:#4caf50; }
+.plot.ready{ background:#2e7d32; }
+
+/* الأزرار */
+button{
+  padding:8px 14px;
+  margin:5px;
+  font-size:16px;
+}
+
+/* المتجر */
+#shop{
+  background:#ffffffdd;
+  padding:10px;
+  margin:10px auto;
+  width:260px;
+  border-radius:8px;
+}
 </style>
 </head>
+
 <body>
-<div id="game-container"></div>
-<div id="ui">
-<span id="goldText">الذهب: 500</span> | <span id="levelText">المستوى: 1</span><br>
-<button onclick="openStore()">المتجر</button>
-<button onclick="saveGame()">حفظ اللعبة</button>
-<div id="store">
-<h4>المتجر</h4>
-<button onclick="buyItem('دجاج',50)">دجاج - 50 ذهب</button>
-<button onclick="buyItem('بقر',200)">بقر - 200 ذهب</button>
-<button onclick="buyItem('طماطم',10)">طماطم - 10 ذهب</button>
-<button onclick="closeStore()">إغلاق المتجر</button>
+
+<div id="top">
+💰 الذهب: <span id="gold">100</span> |
+🐔 دجاج: <span id="chicken">0</span> |
+🐄 بقر: <span id="cow">0</span>
 </div>
+
+<div id="farm"></div>
+
+<div id="shop">
+<h3>🛒 المتجر</h3>
+<button onclick="buyChicken()">🐔 شراء دجاج (50)</button><br>
+<button onclick="buyCow()">🐄 شراء بقر (120)</button><br>
+<button onclick="saveGame()">💾 حفظ اللعبة</button>
 </div>
 
 <script>
-// بيانات اللاعب
-let playerData = { gold:500, level:1, experience:0, inventory:{}, farm:[] };
+// ====== البيانات ======
+let gold = 100;
+let chickens = 0;
+let cows = 0;
+let plots = [];
 
-// إعداد Phaser
-const config = {
-    type: Phaser.AUTO,
-    width: 600,
-    height: 400,
-    parent: 'game-container',
-    physics: { default: 'arcade', arcade: { debug: false } },
-    scene: { preload, create, update }
-};
-const game = new Phaser.Game(config);
-let farmTiles = [];
-
-function preload() {
-    // تحميل الصور
-    this.load.image('grass','https://i.imgur.com/JlZx1ZV.png'); // العشب
-    this.load.image('dirt','https://i.imgur.com/4p0u7TG.png'); // تربة طينية واقعية
-    this.load.spritesheet('chicken','https://i.imgur.com/KhH1F4M.png',{ frameWidth:32, frameHeight:32 });
-    this.load.spritesheet('cow','https://i.imgur.com/3pXvRSR.png',{ frameWidth:32, frameHeight:32 });
-    this.load.image('tomato','https://i.imgur.com/YJ2RslQ.png');
+// ====== تحميل ======
+function loadGame(){
+  const data = JSON.parse(localStorage.getItem("farmSave"));
+  if(data){
+    gold = data.gold;
+    chickens = data.chickens;
+    cows = data.cows;
+    plots = data.plots;
+  }else{
+    plots = Array(25).fill("empty");
+  }
 }
 
-function create() {
-    // إنشاء مزرعة 5x5 مربعات تربة
-    let startX = 80, startY = 60;
-    let tileWidth = 80, tileHeight = 50;
-    for(let y=0;y<5;y++){
-        for(let x=0;x<5;x++){
-            // خريطة العشب خلف التربة
-            this.add.image(startX + x*tileWidth, startY + y*tileHeight, 'grass').setScale(1.2);
-            // التربة الطينية
-            let tile = this.add.image(startX + x*tileWidth, startY + y*tileHeight, 'dirt').setInteractive();
-            tile.displayWidth = tileWidth - 4; // جعلها تبدو مثل أرض الزراعة
-            tile.displayHeight = tileHeight - 4;
-            tile.on('pointerdown', ()=>plantCrop(tile,x + y*5));
-            farmTiles.push({sprite:tile, crop:null});
-        }
-    }
-
-    // وضع بعض المحاصيل الافتراضية (طماطم)
-    for(let i=0;i<5;i++){
-        let cropSprite = this.add.image(farmTiles[i].sprite.x, farmTiles[i].sprite.y-15,'tomato').setScale(0.8);
-        farmTiles[i].crop = cropSprite;
-    }
-
-    // الحيوانات المتحركة
-    this.chicken = this.add.sprite(450,100,'chicken').play('walkChicken');
-    this.cow = this.add.sprite(520,200,'cow').play('walkCow');
-
-    this.anims.create({key:'walkChicken', frames:this.anims.generateFrameNumbers('chicken',{start:0,end:3}), frameRate:4, repeat:-1});
-    this.anims.create({key:'walkCow', frames:this.anims.generateFrameNumbers('cow',{start:0,end:3}), frameRate:2, repeat:-1});
-
-    // استعادة البيانات
-    const saved = localStorage.getItem('farmGame');
-    if(saved) playerData = JSON.parse(saved);
-    updateUI();
-}
-
-// زرع المحاصيل
-function plantCrop(tile,index){
-    const crop = prompt('اختر محصول للزرع: طماطم');
-    if(crop==='طماطم'){
-        if(farmTiles[index].crop) return alert('يوجد محصول هنا!');
-        let cropSprite = game.scene.scenes[0].add.image(tile.x, tile.y-15,'tomato').setScale(0.8);
-        farmTiles[index].crop = cropSprite;
-        playerData.experience += 10;
-        playerData.gold += 20;
-        checkLevel();
-        updateUI();
-        alert('تم زرع وحصاد '+crop);
-    }
-}
-
-// المتجر
-function openStore(){ document.getElementById('store').style.display='block'; }
-function closeStore(){ document.getElementById('store').style.display='none'; }
-
-function buyItem(name, price){
-    if(playerData.gold>=price){
-        playerData.gold-=price;
-        if(!playerData.inventory[name]) playerData.inventory[name]=0;
-        playerData.inventory[name]++;
-        updateUI();
-        alert('تم شراء '+name);
-    } else alert('لا يوجد ذهب كافي');
-}
-
-// تحديث الواجهة
-function updateUI(){
-    document.getElementById('goldText').innerText = 'الذهب: '+playerData.gold;
-    document.getElementById('levelText').innerText = 'المستوى: '+playerData.level;
-}
-
-// فحص المستوى
-function checkLevel(){
-    if(playerData.experience >= playerData.level*50){
-        playerData.experience = 0;
-        playerData.level++;
-        alert('تهانينا! وصلت للمستوى '+playerData.level);
-        updateUI();
-    }
-}
-
-// حفظ اللعبة
+// ====== حفظ ======
 function saveGame(){
-    localStorage.setItem('farmGame',JSON.stringify(playerData));
-    console.log('تم حفظ اللعبة!');
+  localStorage.setItem("farmSave", JSON.stringify({
+    gold, chickens, cows, plots
+  }));
+  alert("تم حفظ اللعبة ✔");
 }
+
+// ====== رسم المزرعة ======
+const farm = document.getElementById("farm");
+
+function drawFarm(){
+  farm.innerHTML="";
+  plots.forEach((state,i)=>{
+    const div=document.createElement("div");
+    div.className="plot";
+    if(state==="seed") div.classList.add("seed");
+    if(state==="grow") div.classList.add("grow");
+    if(state==="ready") div.classList.add("ready");
+
+    div.onclick=()=>clickPlot(i);
+    farm.appendChild(div);
+  });
+
+  document.getElementById("gold").textContent=gold;
+  document.getElementById("chicken").textContent=chickens;
+  document.getElementById("cow").textContent=cows;
+}
+
+// ====== تفاعل الأرض ======
+function clickPlot(i){
+  if(plots[i]==="empty"){
+    plots[i]="seed";
+    setTimeout(()=>{ plots[i]="grow"; drawFarm(); },2000);
+    setTimeout(()=>{ plots[i]="ready"; drawFarm(); },5000);
+  }
+  else if(plots[i]==="ready"){
+    plots[i]="empty";
+    gold += 10 + chickens*2 + cows*4; // الحيوانات تزود الدخل
+  }
+  drawFarm();
+}
+
+// ====== المتجر ======
+function buyChicken(){
+  if(gold>=50){
+    gold-=50;
+    chickens++;
+    drawFarm();
+  }else alert("الذهب غير كافي");
+}
+
+function buyCow(){
+  if(gold>=120){
+    gold-=120;
+    cows++;
+    drawFarm();
+  }else alert("الذهب غير كافي");
+}
+
+// ====== تشغيل ======
+loadGame();
+drawFarm();
 
 // حفظ تلقائي كل دقيقة
-setInterval(()=>{ saveGame(); },60000);
-
-function update(){}
+setInterval(saveGame,60000);
 </script>
+
 </body>
 </html>
