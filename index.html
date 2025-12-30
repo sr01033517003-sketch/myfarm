@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مزرعتي الواقعية</title>
 <style>
-body { font-family: Arial, sans-serif; background: #a2d149; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background:#a2d149; margin:0; padding:0; }
 #login, #game { display:none; padding:20px; }
 button { padding:10px 15px; margin:5px; cursor:pointer; }
 #farm { display:grid; grid-template-columns: repeat(5, 60px); grid-gap:5px; margin-top:20px; }
@@ -25,6 +25,7 @@ button { padding:10px 15px; margin:5px; cursor:pointer; }
 <div id="game">
 <h2>مرحبًا <span id="playerName"></span></h2>
 <p>الذهب: <span id="gold">0</span></p>
+<p>المستوى: <span id="level">1</span></p>
 <button onclick="openStore()">المتجر</button>
 <button onclick="saveGame()">حفظ اللعبة</button>
 
@@ -53,6 +54,8 @@ button { padding:10px 15px; margin:5px; cursor:pointer; }
 <button onclick="buyItem('شجرة تفاح',100)">شجرة تفاح - 100 ذهب</button>
 <button onclick="buyItem('شجرة برتقال',100)">شجرة برتقال - 100 ذهب</button>
 <button onclick="buyItem('شجرة موز',100)">شجرة موز - 100 ذهب</button>
+<button onclick="buyItem('شجرة جوافة',100)">شجرة جوافة - 100 ذهب</button>
+<button onclick="buyItem('شجرة مانجا',100)">شجرة مانجا - 100 ذهب</button>
 
 <p>المصانع:</p>
 <button onclick="buyItem('مصنع ألبان',500)">مصنع ألبان - 500 ذهب</button>
@@ -71,7 +74,14 @@ button { padding:10px 15px; margin:5px; cursor:pointer; }
 
 <script>
 // ===== بيانات اللعبة =====
-let player = { name:'', gold:500, farm:Array(25).fill(''), inventory:{} };
+let player = { 
+    name:'', 
+    gold:500, 
+    level:1,
+    farm:Array(25).fill(''), 
+    inventory:{},
+    experience:0
+};
 
 // ===== تسجيل الدخول =====
 function login(){
@@ -79,7 +89,6 @@ function login(){
     if(!name) return alert('اكتب اسمك');
     player.name = name;
 
-    // استعادة اللعبة من LocalStorage
     const saved = localStorage.getItem('farmGame_' + name);
     if(saved) player = JSON.parse(saved);
 
@@ -87,6 +96,7 @@ function login(){
     document.getElementById('game').style.display = 'block';
     document.getElementById('playerName').innerText = player.name;
     document.getElementById('gold').innerText = player.gold;
+    document.getElementById('level').innerText = player.level;
     renderFarm();
     renderInventory();
 }
@@ -108,10 +118,12 @@ function renderFarm(){
 function plantOrHarvest(i){
     if(player.farm[i]){
         alert('تم حصاد: ' + player.farm[i]);
-        player.gold += 20; // ربح من المحصول
+        player.gold += 20;
+        player.experience += 10;
         player.farm[i]='';
         renderFarm();
         document.getElementById('gold').innerText = player.gold;
+        checkLevel();
     } else {
         const crop = prompt('اختر محصول للزرع: طماطم، بطاطس، جزر، باذنجان، كوسة، ذرة');
         if(crop && player.inventory[crop]>0){
@@ -147,10 +159,20 @@ function renderInventory(){
     }
 }
 
+// ===== المستويات =====
+function checkLevel(){
+    if(player.experience >= player.level*100){
+        player.experience = 0;
+        player.level++;
+        document.getElementById('level').innerText = player.level;
+        alert('تهانينا! وصلت للمستوى '+player.level);
+    }
+}
+
 // ===== حفظ اللعبة تلقائيًا =====
 function saveGame(){
     localStorage.setItem('farmGame_' + player.name, JSON.stringify(player));
-    alert('تم حفظ اللعبة!');
+    console.log('تم حفظ اللعبة!');
 }
 
 // حفظ تلقائي كل دقيقة
