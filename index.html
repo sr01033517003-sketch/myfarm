@@ -4,183 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مزرعتي الواقعية</title>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
 <style>
-body { font-family: Arial, sans-serif; background:#a2d149; margin:0; padding:0; }
-#login, #game { display:none; padding:20px; }
-button { padding:10px 15px; margin:5px; cursor:pointer; }
-#farm { display:grid; grid-template-columns: repeat(5, 60px); grid-gap:5px; margin-top:20px; }
-.tile { width:60px; height:60px; background:#7cfc00; border:1px solid #555; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; text-align:center; }
-#store { display:none; background:#fff; padding:10px; border:1px solid #000; margin-top:10px; }
-#inventory { margin-top:10px; }
+body { margin:0; padding:0; }
+#game-container { width:100%; height:100vh; }
 </style>
 </head>
 <body>
-
-<div id="login">
-<h2>تسجيل الدخول</h2>
-<input id="username" placeholder="اكتب اسمك"><br>
-<button onclick="login()">دخول</button>
-</div>
-
-<div id="game">
-<h2>مرحبًا <span id="playerName"></span></h2>
-<p>الذهب: <span id="gold">0</span></p>
-<p>المستوى: <span id="level">1</span></p>
-<button onclick="openStore()">المتجر</button>
-<button onclick="saveGame()">حفظ اللعبة</button>
-
-<div id="farm"></div>
-
-<div id="store">
-<h3>المتجر</h3>
-<p>الحيوانات:</p>
-<button onclick="buyItem('دجاج',50)">دجاج - 50 ذهب</button>
-<button onclick="buyItem('بقر',200)">بقر - 200 ذهب</button>
-<button onclick="buyItem('غنم',150)">غنم - 150 ذهب</button>
-<button onclick="buyItem('ماعز',120)">ماعز - 120 ذهب</button>
-<button onclick="buyItem('جمل',500)">جمل - 500 ذهب</button>
-<button onclick="buyItem('حصان',400)">حصان - 400 ذهب</button>
-<button onclick="buyItem('كلب',300)">كلب - 300 ذهب</button>
-
-<p>المحاصيل:</p>
-<button onclick="buyItem('طماطم',10)">طماطم - 10 ذهب</button>
-<button onclick="buyItem('بطاطس',10)">بطاطس - 10 ذهب</button>
-<button onclick="buyItem('جزر',10)">جزر - 10 ذهب</button>
-<button onclick="buyItem('باذنجان',10)">باذنجان - 10 ذهب</button>
-<button onclick="buyItem('كوسة',10)">كوسة - 10 ذهب</button>
-<button onclick="buyItem('ذرة',10)">ذرة - 10 ذهب</button>
-
-<p>الأشجار:</p>
-<button onclick="buyItem('شجرة تفاح',100)">شجرة تفاح - 100 ذهب</button>
-<button onclick="buyItem('شجرة برتقال',100)">شجرة برتقال - 100 ذهب</button>
-<button onclick="buyItem('شجرة موز',100)">شجرة موز - 100 ذهب</button>
-<button onclick="buyItem('شجرة جوافة',100)">شجرة جوافة - 100 ذهب</button>
-<button onclick="buyItem('شجرة مانجا',100)">شجرة مانجا - 100 ذهب</button>
-
-<p>المصانع:</p>
-<button onclick="buyItem('مصنع ألبان',500)">مصنع ألبان - 500 ذهب</button>
-<button onclick="buyItem('مصنع جبن',500)">مصنع جبن - 500 ذهب</button>
-<button onclick="buyItem('خلية نحل',300)">خلية نحل - 300 ذهب</button>
-
-<button onclick="closeStore()">إغلاق المتجر</button>
-</div>
-
-<div id="inventory">
-<h3>المخزن:</h3>
-<div id="items"></div>
-</div>
-
-</div>
+<div id="game-container"></div>
 
 <script>
-// ===== بيانات اللعبة =====
-let player = { 
-    name:'', 
-    gold:500, 
-    level:1,
-    farm:Array(25).fill(''), 
-    inventory:{},
-    experience:0
+const config = {
+    type: Phaser.AUTO,
+    width: 600,
+    height: 400,
+    parent: 'game-container',
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
 };
 
-// ===== تسجيل الدخول =====
-function login(){
-    const name = document.getElementById('username').value;
-    if(!name) return alert('اكتب اسمك');
-    player.name = name;
+const game = new Phaser.Game(config);
+let playerData = { gold:500, inventory:{}, farm:[], level:1 };
 
-    const saved = localStorage.getItem('farmGame_' + name);
-    if(saved) player = JSON.parse(saved);
-
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-    document.getElementById('playerName').innerText = player.name;
-    document.getElementById('gold').innerText = player.gold;
-    document.getElementById('level').innerText = player.level;
-    renderFarm();
-    renderInventory();
+function preload() {
+    // تحميل صور الأرضية والحيوانات والمحاصيل
+    this.load.image('grass', 'https://i.imgur.com/JlZx1ZV.png'); // أرضية خضراء
+    this.load.image('dirt', 'https://i.imgur.com/8Y3Q5Bf.png');  // تربة
+    this.load.spritesheet('chicken', 'https://i.imgur.com/KhH1F4M.png', { frameWidth:32, frameHeight:32 });
+    this.load.spritesheet('cow', 'https://i.imgur.com/3pXvRSR.png', { frameWidth:32, frameHeight:32 });
+    this.load.image('tomato', 'https://i.imgur.com/YJ2RslQ.png'); // مثال محصول
 }
 
-// ===== المزرعة =====
-function renderFarm(){
-    const farmDiv = document.getElementById('farm');
-    farmDiv.innerHTML = '';
-    for(let i=0;i<25;i++){
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.innerText = player.farm[i] ? player.farm[i] : '';
-        tile.onclick = () => plantOrHarvest(i);
-        farmDiv.appendChild(tile);
+let farmTiles = [];
+
+function create() {
+    // إنشاء مزرعة 5x5
+    for(let y=0; y<5; y++){
+        for(let x=0; x<5; x++){
+            let tile = this.add.image(50 + x*100, 50 + y*70, 'dirt').setInteractive();
+            tile.on('pointerdown', () => plantCrop(tile, x + y*5));
+            farmTiles.push({sprite: tile, crop:null});
+        }
+    }
+
+    // إنشاء بعض الحيوانات
+    this.chicken = this.add.sprite(400, 100, 'chicken').play('walkChicken');
+    this.cow = this.add.sprite(500, 200, 'cow').play('walkCow');
+
+    // إنشاء الرسوم المتحركة
+    this.anims.create({
+        key: 'walkChicken',
+        frames: this.anims.generateFrameNumbers('chicken', { start:0, end:3 }),
+        frameRate:4,
+        repeat:-1
+    });
+    this.anims.create({
+        key: 'walkCow',
+        frames: this.anims.generateFrameNumbers('cow', { start:0, end:3 }),
+        frameRate:2,
+        repeat:-1
+    });
+}
+
+function update(){}
+
+// زرع المحاصيل
+function plantCrop(tile, index){
+    const crop = prompt('اختر محصول للزرع: طماطم');
+    if(crop==='طماطم'){
+        if(farmTiles[index].crop) return alert('يوجد محصول هنا!');
+        let cropSprite = game.scene.scenes[0].add.image(tile.x, tile.y-20, 'tomato');
+        farmTiles[index].crop = cropSprite;
+        alert('تم زرع ' + crop);
     }
 }
-
-// زرع أو حصاد المحاصيل
-function plantOrHarvest(i){
-    if(player.farm[i]){
-        alert('تم حصاد: ' + player.farm[i]);
-        player.gold += 20;
-        player.experience += 10;
-        player.farm[i]='';
-        renderFarm();
-        document.getElementById('gold').innerText = player.gold;
-        checkLevel();
-    } else {
-        const crop = prompt('اختر محصول للزرع: طماطم، بطاطس، جزر، باذنجان، كوسة، ذرة');
-        if(crop && player.inventory[crop]>0){
-            player.farm[i] = crop;
-            player.inventory[crop]--;
-            renderFarm();
-            renderInventory();
-        } else alert('المحصول غير متوفر في المخزن');
-    }
-}
-
-// ===== المتجر =====
-function openStore(){ document.getElementById('store').style.display='block'; }
-function closeStore(){ document.getElementById('store').style.display='none'; }
-
-function buyItem(name, price){
-    if(player.gold >= price){
-        player.gold -= price;
-        if(!player.inventory[name]) player.inventory[name]=0;
-        player.inventory[name]++;
-        document.getElementById('gold').innerText = player.gold;
-        renderInventory();
-        alert('تم شراء '+name);
-    } else alert('لا يوجد ذهب كافي');
-}
-
-// ===== المخزن =====
-function renderInventory(){
-    const itemsDiv = document.getElementById('items');
-    itemsDiv.innerHTML = '';
-    for(let key in player.inventory){
-        itemsDiv.innerHTML += key + ' : ' + player.inventory[key] + '<br>';
-    }
-}
-
-// ===== المستويات =====
-function checkLevel(){
-    if(player.experience >= player.level*100){
-        player.experience = 0;
-        player.level++;
-        document.getElementById('level').innerText = player.level;
-        alert('تهانينا! وصلت للمستوى '+player.level);
-    }
-}
-
-// ===== حفظ اللعبة تلقائيًا =====
-function saveGame(){
-    localStorage.setItem('farmGame_' + player.name, JSON.stringify(player));
-    console.log('تم حفظ اللعبة!');
-}
-
-// حفظ تلقائي كل دقيقة
-setInterval(() => {
-    if(player.name) saveGame();
-}, 60000);
 </script>
-
 </body>
-    </html>
-    
+</html>
