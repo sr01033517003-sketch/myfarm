@@ -2,136 +2,153 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لعبة المزرعة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مزرعتي</title>
 
 <style>
-body{font-family:tahoma;margin:0;background:#4caf50;text-align:center}
-.box{background:#fff;padding:15px;margin:20px;border-radius:12px}
-input,button{padding:10px;margin:5px;font-size:16px;border-radius:8px}
-.farm{display:grid;grid-template-columns:repeat(5,60px);gap:6px;justify-content:center}
-.plot{width:60px;height:60px;background:#6d4c41;color:white;font-size:26px;
-display:flex;align-items:center;justify-content:center;border-radius:8px}
-.top{background:#795548;color:white;padding:10px}
-.hidden{display:none}
-.chat{background:#eee;height:120px;overflow:auto;margin:10px;padding:5px}
+body{
+margin:0;
+font-family:tahoma;
+background:#2e7d32;
+color:white;
+text-align:center;
+}
+
+.top{
+background:#1b5e20;
+padding:10px;
+font-size:18px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+}
+
+.farm{
+background:#4caf50;
+margin:15px auto;
+padding:15px;
+border-radius:15px;
+display:grid;
+grid-template-columns:repeat(3,90px);
+gap:10px;
+width:max-content;
+}
+
+.plot{
+width:90px;
+height:90px;
+background:#795548;
+border-radius:12px;
+font-size:32px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
+
+.controls button{
+margin:5px;
+padding:10px 14px;
+font-size:16px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.plant{background:#66bb6a}
+.harvest{background:#ffb300}
+.shop{background:#6d4c41;color:white}
+
+.box{
+background:#ffffff22;
+margin:10px;
+padding:10px;
+border-radius:12px;
+}
 </style>
 </head>
 
 <body>
 
-<div id="loginBox" class="box">
-<h2>تسجيل الدخول</h2>
-<input id="user" placeholder="اسم المستخدم"><br>
-<input id="pass" type="password" placeholder="كلمة المرور"><br>
-<button onclick="login()">دخول / تسجيل</button>
-</div>
-
-<div id="game" class="hidden">
 <div class="top">
-👤 <span id="player"></span> |
-💰 <span id="money">0</span>
-<button onclick="logout()">خروج</button>
+💰 <span id="money">100</span>
+👤 <span id="user">لاعب</span>
 </div>
 
 <div class="farm" id="farm"></div>
 
-<button onclick="plant()">🌱 زرع</button>
-<button onclick="harvest()">🌾 حصاد</button>
-
-<div class="box">
-<h3>🐄 الحيوانات</h3>
-🐄 بقرة | 🐑 خروف | 🐔 دجاجة | 🐎 حصان
+<div class="controls">
+<button class="plant" onclick="plant()">🌱 زرع</button>
+<button class="harvest" onclick="harvest()">🌾 حصاد</button>
+<button class="shop" onclick="buyLand()">🛒 توسيع الأرض (50)</button>
 </div>
 
 <div class="box">
-<h3>💬 محادثة الأصدقاء</h3>
-<div class="chat" id="chat"></div>
-<input id="msg" placeholder="اكتب رسالة">
-<button onclick="send()">إرسال</button>
-</div>
+🐄 بقرة | 🐑 خروف | 🐔 دجاجة | 🐎 حصان  
+<br> (قريبًا إنتاج وربح)
 </div>
 
 <script>
-let currentUser="";
+let data = JSON.parse(localStorage.getItem("farmData")) || {
+money:100,
+land:6,
+plots:Array(6).fill("")
+};
+
 let selected=null;
-let data={money:50,farm:Array(25).fill("")};
-
-function login(){
-let u=user.value,p=pass.value;
-if(!u||!p)return;
-currentUser=u;
-let saved=localStorage.getItem("farm_"+u);
-if(saved)data=JSON.parse(saved);
-player.innerText=u;
-money.innerText=data.money;
-loginBox.classList.add("hidden");
-game.classList.remove("hidden");
-drawFarm();
-loadChat();
-}
-
-function logout(){
-save();
-location.reload();
-}
 
 function save(){
-localStorage.setItem("farm_"+currentUser,JSON.stringify(data));
+localStorage.setItem("farmData",JSON.stringify(data));
 }
 
-function drawFarm(){
+function draw(){
+money.innerText=data.money;
 farm.innerHTML="";
-data.farm.forEach((v,i)=>{
+for(let i=0;i<data.land;i++){
 let d=document.createElement("div");
 d.className="plot";
-d.innerText=v;
+d.innerText=data.plots[i]||"";
 d.onclick=()=>selected=i;
 farm.appendChild(d);
-});
+}
+save();
 }
 
 function plant(){
-if(selected===null)return;
-if(data.farm[selected]===""){
-data.farm[selected]="🌱";
-data.money-=2;
-update();
+if(selected===null) return;
+if(data.plots[selected]==="" && data.money>=5){
+data.plots[selected]="🌱";
+data.money-=5;
+draw();
 setTimeout(()=>{
-if(data.farm[selected]==="🌱"){
-data.farm[selected]="🌾";
-drawFarm();save();
-}},4000);
+if(data.plots[selected]==="🌱"){
+data.plots[selected]="🌾";
+draw();
+}
+},4000);
 }
 }
 
 function harvest(){
-if(selected===null)return;
-if(data.farm[selected]==="🌾"){
-data.farm[selected]="";
-data.money+=5;
-update();
+if(selected===null) return;
+if(data.plots[selected]==="🌾"){
+data.plots[selected]="";
+data.money+=15;
+draw();
 }
 }
 
-function update(){
-money.innerText=data.money;
-drawFarm();save();
+function buyLand(){
+let cost=50;
+if(data.money>=cost){
+data.money-=cost;
+data.land++;
+data.plots.push("");
+draw();
+}
 }
 
-/* ====== الشات ====== */
-function loadChat(){
-chat.innerHTML=localStorage.getItem("chat")||"";
-}
-
-function send(){
-let text=msg.value;
-if(!text)return;
-let line=`<div><b>${currentUser}:</b> ${text}</div>`;
-chat.innerHTML+=line;
-localStorage.setItem("chat",chat.innerHTML);
-msg.value="";
-}
+draw();
 </script>
 
 </body>
