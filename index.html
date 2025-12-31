@@ -2,39 +2,118 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعة الأساطير - دخول آمن</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المزرعة السعيدة - الإصدار النهائي</title>
     <style>
-        body { background: #1b5e20; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .box { background: white; color: black; padding: 20px; border-radius: 15px; display: inline-block; border: 5px solid #ffd700; }
-        input { padding: 10px; margin: 10px; width: 200px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        body { background: #1b5e20; font-family: sans-serif; margin: 0; color: white; text-align: center; }
+        #login-screen { position: fixed; inset: 0; background: #1b5e20; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .card { background: white; color: #333; padding: 30px; border-radius: 20px; border: 5px solid #ffd700; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        input { padding: 12px; margin: 10px; border-radius: 8px; border: 2px solid #ddd; width: 220px; font-size: 16px; }
+        button { background: #2e7d32; color: white; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 18px; }
+        
+        .header { background: #2e7d32; padding: 15px; display: flex; justify-content: space-around; border-bottom: 4px solid #ffd700; }
+        .farm-grid { display: grid; grid-template-columns: repeat(4, 75px); gap: 10px; justify-content: center; margin: 20px auto; padding: 20px; background: #4caf50; border: 8px solid #3e2723; border-radius: 20px; width: fit-content; }
+        .plot { width: 75px; height: 75px; background: #5d4037; border-radius: 10px; border: 2px solid #3d1c02; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div id="login-box" class="box">
-        <h2>🚜 مرحباً بك مجدداً</h2>
-        <p>اكتب اسمك واضغط دخول:</p>
-        <input type="text" id="user-name" placeholder="اسمك المحفوظ">
-        <br>
-        <button onclick="enterFarm()">دخول المزرعة</button>
+
+    <div id="login-screen">
+        <div class="card">
+            <h2>🌾 دخول المزرعة</h2>
+            <input type="text" id="username" placeholder="اكتب اسمك هنا">
+            <br>
+            <button onclick="start()">انطلق الآن</button>
+        </div>
+    </div>
+
+    <div id="game-ui" class="hidden">
+        <div class="header">
+            <div>💰 ذهب: <span id="gold-val">0</span></div>
+            <div>⭐ مستوى: <span id="lvl-val">1</span></div>
+            <button onclick="location.reload()" style="background:red; font-size:12px; padding:5px;">خروج</button>
+        </div>
+
+        <div class="farm-grid" id="grid"></div>
+
+        <div style="margin-top:20px;">
+            <button onclick="sell()">بيع كل المحصول 💰</button>
+        </div>
     </div>
 
     <script>
-        function enterFarm() {
-            let u = document.getElementById('user-name').value.trim();
-            if(!u) return alert("اكتب اسمك!");
-            
-            // استعادة البيانات من الذاكرة القديمة
-            let data = localStorage.getItem('pro_farm_' + u) || localStorage.getItem('happy_farm_' + u);
-            
-            if(data) {
-                alert("تم العثور على مزرعتك! جاري التحميل...");
-                // هنا نقوم بتوجيه الكود لعرض المزرعة
-                location.reload(); 
+        let farm = { user: "", gold: 1000, lvl: 1, inv: 0 };
+
+        function start() {
+            let u = document.getElementById('username').value.trim();
+            if(!u) return alert("من فضلك اكتب اسمك!");
+
+            // محاولة جلب البيانات من كل الأسماء السابقة الممكنة
+            let saved = localStorage.getItem('pro_farm_' + u) || 
+                        localStorage.getItem('happy_farm_' + u) || 
+                        localStorage.getItem('farm_' + u);
+
+            if(saved) {
+                farm = JSON.parse(saved);
+                alert("أهلاً بك مجدداً يا " + u + "! مستواك: " + farm.lvl);
             } else {
-                alert("اسم جديد؟ سيتم إنشاء مزرعة جديدة لك.");
-                location.reload();
+                farm.user = u;
+                alert("مرحباً بك كلاعب جديد!");
             }
+
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('hidden');
+            setupGrid();
+            updateDisplay();
+        }
+
+        function setupGrid() {
+            const g = document.getElementById('grid');
+            g.innerHTML = "";
+            for(let i=0; i<16; i++) {
+                let p = document.createElement('div');
+                p.className = 'plot';
+                p.onclick = () => plant(p);
+                g.appendChild(p);
+            }
+        }
+
+        function plant(p) {
+            if(p.innerHTML === "") {
+                p.innerHTML = "🌱";
+                setTimeout(() => {
+                    p.innerHTML = (farm.lvl >= 4) ? "🍓" : "🌽";
+                    p.onclick = () => {
+                        farm.inv++;
+                        p.innerHTML = "";
+                        p.onclick = () => plant(p);
+                        updateDisplay();
+                    };
+                }, 2000);
+            }
+        }
+
+        function sell() {
+            if(farm.inv > 0) {
+                let price = 100 + (farm.lvl * 50);
+                farm.gold += farm.inv * price;
+                farm.inv = 0;
+                
+                // تحديث المستوى بناء على الذهب
+                if(farm.gold >= 10000) farm.lvl = 4;
+                else if(farm.gold >= 5000) farm.lvl = 3;
+                else if(farm.gold >= 2000) farm.lvl = 2;
+
+                updateDisplay();
+                alert("تم البيع! رصيدك الآن: " + farm.gold);
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('gold-val').innerText = farm.gold;
+            document.getElementById('lvl-val').innerText = farm.lvl;
+            localStorage.setItem('pro_farm_' + farm.user, JSON.stringify(farm));
         }
     </script>
 </body>
