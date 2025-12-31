@@ -2,35 +2,63 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعة الأساطير الواقعية</title>
+    <title>مزرعة الأساطير - النسخة الواقعية الكبيرة</title>
     <style>
-        body { background: #2e7d32; font-family: 'Segoe UI'; margin: 0; color: white; text-align: center; }
-        .top-bar { background: #1b5e20; padding: 10px; display: flex; justify-content: space-around; border-bottom: 4px solid #ffd700; position: sticky; top: 0; z-index: 1000; }
-        .stat-box { background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #ffd700; font-weight: bold; }
+        body { background: #1b5e20; font-family: 'Segoe UI', sans-serif; margin: 0; color: white; text-align: center; }
+        .top-bar { background: #2e7d32; padding: 15px; display: flex; justify-content: space-around; border-bottom: 5px solid #ffd700; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .stat-box { background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 30px; border: 2px solid #ffd700; font-weight: bold; font-size: 20px; }
         
-        .game-world { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+        .game-world { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; }
         
-        /* ساحة الحيوانات بصور حقيقية */
-        .zone { background-image: url('https://img.freepik.com/free-vector/pixel-art-grass-background_52683-113066.jpg'); background-size: cover; border: 6px solid #5d4037; border-radius: 25px; min-width: 320px; min-height: 280px; position: relative; overflow: hidden; }
-        .animal-img { position: absolute; width: 60px; height: 60px; transition: all 3s ease-in-out; filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.3)); }
+        /* ساحة الحيوانات الكبيرة */
+        .animal-zone { 
+            width: 90%; max-width: 800px; height: 400px; 
+            background-image: url('https://img.freepik.com/free-vector/pixel-art-grass-background_52683-113066.jpg'); 
+            background-size: cover; border: 10px solid #5d4037; border-radius: 40px; 
+            position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+        
+        .animal-img { 
+            position: absolute; 
+            width: 100px; height: 100px; /* تم تكبير الحجم هنا */
+            transition: all 4s ease-in-out; 
+            filter: drop-shadow(5px 10px 5px rgba(0,0,0,0.4)); 
+            cursor: pointer;
+        }
 
-        /* منطقة الزراعة */
-        .farm-grid { display: grid; grid-template-columns: repeat(4, 75px); gap: 10px; background: #4caf50; border: 8px solid #3e2723; border-radius: 20px; padding: 15px; }
-        .plot { width: 75px; height: 75px; background: #5d4037; border: 2px solid #3d1c02; border-radius: 10px; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 35px; }
-        .timer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #00ff00; font-size: 11px; border-radius: 0 0 8px 8px; }
+        /* شبكة الزراعة المطورة */
+        .farm-grid { 
+            display: grid; grid-template-columns: repeat(4, 85px); gap: 12px; 
+            background: #3e2723; border: 10px solid #2d1b10; border-radius: 25px; padding: 20px; 
+        }
+        .plot { 
+            width: 85px; height: 85px; background: #5d4037; border: 3px solid #3d1c02; 
+            border-radius: 12px; position: relative; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; font-size: 40px; 
+        }
+        .timer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); color: #00ff00; font-size: 12px; border-radius: 0 0 10px 10px; font-weight: bold; }
 
-        .shop-panel { background: white; color: #333; max-width: 900px; margin: 20px auto; border-radius: 20px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
-        .btn-buy { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        .shop-panel { 
+            background: #fff; color: #333; width: 90%; max-width: 800px; 
+            margin: 20px auto; border-radius: 30px; padding: 25px; 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; 
+        }
+        .shop-item { border: 3px solid #f0f0f0; border-radius: 20px; padding: 15px; transition: 0.3s; }
+        .shop-item:hover { transform: translateY(-5px); border-color: #ffd700; }
+        .btn-buy { background: #e67e22; color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 10px; }
+        
+        #login-screen { position: fixed; inset: 0; background: #1b5e20; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="login-screen" style="position:fixed; inset:0; background:#2e7d32; z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:white; color:black; padding:40px; border-radius:30px; text-align:center;">
-        <h2>🌾 المزرعة الواقعية V11</h2>
-        <input type="text" id="username" placeholder="اسمك هنا" style="padding:12px; width:220px; font-size:18px;"><br><br>
-        <button onclick="login()" style="padding:15px 50px; background:#ffd700; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">دخول</button>
+<div id="login-screen">
+    <div style="background:white; color:black; padding:50px; border-radius:40px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <h1 style="color:#2e7d32;">🚜 مزرعة الأساطير V12</h1>
+        <p>أدخل اسمك لتبدأ المزرعة الحقيقية</p>
+        <input type="text" id="username" placeholder="اسمك هنا..." style="padding:15px; width:250px; border-radius:15px; border:2px solid #2e7d32; font-size:18px;"><br><br>
+        <button onclick="login()" style="padding:15px 70px; background:#ffd700; color:#333; border:none; border-radius:20px; font-weight:bold; font-size:22px; cursor:pointer;">دخول</button>
     </div>
 </div>
 
@@ -42,45 +70,43 @@
     </div>
 
     <div class="game-world">
-        <div class="zone" id="animal-zone">
-            <div style="background:#5d4037; color:white; padding:5px; position:absolute; top:0; width:100%; font-size:12px;">ساحة المواشي الواقعية</div>
+        <div class="animal-zone" id="animal-zone">
+            <div style="background:rgba(0,0,0,0.5); color:white; padding:10px; position:absolute; top:0; left:0; right:0; font-size:14px; font-weight:bold;">ساحة المواشي والطيور (صور كبيرة)</div>
         </div>
 
-        <div class="zone" style="background:#5d4037; min-width:auto;">
-            <div class="farm-grid" id="grid"></div>
-        </div>
+        <div class="farm-grid" id="grid"></div>
     </div>
 
-    <button onclick="sellAll()" style="background:#2ecc71; color:white; padding:15px 60px; border:none; border-radius:50px; font-size:20px; font-weight:bold; cursor:pointer; margin:20px;">💰 بيع كل الإنتاج 💰</button>
+    <button onclick="sellAll()" style="background:#2ecc71; color:white; padding:20px 80px; border:none; border-radius:60px; font-size:24px; font-weight:bold; cursor:pointer; margin:20px; box-shadow: 0 8px #27ae60;">💰 بيع المحاصيل والعسل 💰</button>
 
     <div class="shop-panel">
-        <div style="text-align:center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/1864/1864470.png" width="50"><br>
-            دجاجة (100 💰) <button class="btn-buy" onclick="buy('chicken', 100)">شراء</button>
+        <div class="shop-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/1864/1864470.png" width="80"><br>
+            <b>دجاجة بياضة</b><br>100 💰 <button class="btn-buy" onclick="buy('chicken', 100)">شراء</button>
         </div>
-        <div style="text-align:center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" width="50"><br>
-            بقرة (500 💰) <button class="btn-buy" onclick="buy('cow', 500)">شراء</button>
+        <div class="shop-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" width="80"><br>
+            <b>بقرة حلوب</b><br>500 💰 <button class="btn-buy" onclick="buy('cow', 500)">شراء</button>
         </div>
-        <div style="text-align:center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/2153/2153282.png" width="50"><br>
-            خلية نحل (1200 💰) <button class="btn-buy" onclick="buy('bee', 1200)">شراء</button>
+        <div class="shop-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/2153/2153282.png" width="80"><br>
+            <b>خلية نحل</b><br>1200 💰 <button class="btn-buy" onclick="buy('bee', 1200)">شراء</button>
         </div>
     </div>
 </div>
 
 <script>
-    let farm = { user: "", gold: 2000, lvl: 1, inv: 0, honey: 0, animals: [] };
+    let farm = { user: "", gold: 3000, lvl: 1, inv: 0, honey: 0, animals: [] };
     const IMAGES = {
-        chicken: 'https://i.pinimg.com/originals/f3/d9/04/f3d904f981459a96e95b078a94665476.gif',
-        cow: 'https://media.tenor.com/images/73e273069176f140685970c06f366e6a/tenor.gif',
+        chicken: 'https://media.tenor.com/7vY6LToG-eIAAAAj/chicken-walking.gif', // دجاجة حقيقية تمشي
+        cow: 'https://media.tenor.com/p_v0C-m7HwIAAAAj/cow.gif', // بقرة حقيقية
         bee: 'https://cdn-icons-png.flaticon.com/512/2153/2153282.png'
     };
 
     function login() {
         let u = document.getElementById('username').value.trim();
         if(!u) return;
-        let saved = localStorage.getItem('real_farm_v11_' + u);
+        let saved = localStorage.getItem('ultra_farm_v12_' + u);
         if(saved) farm = JSON.parse(saved); else farm.user = u;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('game-ui').classList.remove('hidden');
@@ -88,6 +114,10 @@
         farm.animals.forEach(type => renderAnimal(type));
         updateUI();
         setInterval(moveAnimals, 4000);
+        setInterval(() => {
+            let hives = farm.animals.filter(a => a === 'bee').length;
+            if(hives > 0) { farm.honey += hives; updateUI(); }
+        }, 10000);
     }
 
     function initGrid() {
@@ -113,7 +143,8 @@
                 timer.innerText = Math.floor(timeLeft/60) + ":" + (timeLeft%60).toString().padStart(2,'0');
                 if(timeLeft <= 0) {
                     clearInterval(count);
-                    p.innerText = "🌾";
+                    let crops = ["🌾", "🌿", "🍅", "🍓"];
+                    p.innerText = crops[Math.floor(Math.random()*crops.length)];
                     p.onclick = () => { farm.inv++; p.innerText = ""; p.onclick = () => plant(p); updateUI(); };
                 }
             }, 1000);
@@ -124,12 +155,13 @@
         if(farm.gold >= price) {
             farm.gold -= price;
             farm.animals.push(type);
-            renderAnimal(type);
+            if(type !== 'bee') renderAnimal(type);
             updateUI();
-        } else { alert("الذهب لا يكفي!"); }
+        } else { alert("الذهب غير كافٍ!"); }
     }
 
     function renderAnimal(type) {
+        if(type === 'bee') return;
         let img = document.createElement('img');
         img.src = IMAGES[type];
         img.className = 'animal-img';
@@ -141,25 +173,26 @@
     function moveAnimals() {
         let animals = document.getElementsByClassName('animal-img');
         for(let a of animals) {
-            a.style.left = Math.random() * 80 + "%";
+            a.style.left = Math.random() * 85 + "%";
             a.style.top = Math.random() * 80 + "%";
         }
     }
 
     function sellAll() {
-        let profit = (farm.inv * 200) + (farm.honey * 500);
+        let profit = (farm.inv * 300) + (farm.honey * 600);
         if(profit > 0) {
             farm.gold += profit; farm.inv = 0; farm.honey = 0;
             updateUI();
-            alert("تم البيع بنجاح!");
+            alert("تم بيع المحصول! ربحت " + profit + " 💰");
         }
     }
 
     function updateUI() {
         document.getElementById('gold-val').innerText = farm.gold;
         document.getElementById('lvl-val').innerText = Math.floor(farm.gold / 5000) + 1;
-        localStorage.setItem('real_farm_v11_' + farm.user, JSON.stringify(farm));
+        document.getElementById('honey-val').innerText = farm.honey;
+        localStorage.setItem('ultra_farm_v12_' + farm.user, JSON.stringify(farm));
     }
 </script>
 </body>
-    </html>
+</html>
