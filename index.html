@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مزرعة الأساطير العربية - النسخة الكبرى</title>
+    <title>مزرعة الأساطير العربية - النسخة العملاقة</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
         
@@ -16,293 +16,304 @@
             display: flex; 
             flex-direction: column; 
             color: #fff;
-            overflow: hidden;
+            overflow: hidden; /* منع التمرير الخارجي */
         }
 
-        /* شريط العدادات العلوي - عريض ومنظم */
-        .top-stats { 
+        /* شريط علوي عريض جداً */
+        .top-stats-header { 
             background: #1b5e20; 
-            height: 80px; 
+            height: 90px; 
             display: flex; 
-            justify-content: space-around; 
+            justify-content: space-evenly; 
             align-items: center; 
             border-bottom: 5px solid #ffd700;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            z-index: 1000;
+            padding: 0 20px;
         }
         .stat-card { 
-            background: rgba(255,255,255,0.15); 
-            padding: 10px 25px; 
+            background: rgba(255,255,255,0.1); 
+            padding: 12px 25px; 
             border-radius: 15px; 
             border: 2px solid #ffd700; 
-            font-size: 18px; 
+            font-size: 16px; 
             font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            min-width: 140px;
+            text-align: center;
         }
 
-        .main-world { 
+        /* الحاوية الرئيسية تمتد بملء الشاشة */
+        .world-container { 
             flex: 1; 
             display: flex; 
-            padding: 20px;
-            gap: 20px;
+            padding: 10px;
+            gap: 15px;
             background: #4caf50;
+            height: calc(100vh - 240px); /* موازنة الارتفاع */
         }
 
-        /* القائمة الجانبية للمتجر */
-        .shop-sidebar { 
-            width: 250px; 
+        /* المتجر الجانبي الكبير */
+        .mega-shop { 
+            width: 300px; 
             background: #B2DFDB; 
             border-radius: 20px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            border: 4px solid #00897B;
+            gap: 12px;
+            border: 5px solid #00897B;
             color: #004D40;
+            overflow-y: auto;
         }
-        .item-btn { 
-            width: 100%; padding: 15px; border: none; 
-            background: #ef6c00; color: white; border-radius: 12px; 
+        .shop-item {
+            background: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            border-bottom: 4px solid #00897B;
+        }
+        .shop-btn { 
+            width: 100%; padding: 10px; border: none; 
+            background: #ef6c00; color: white; border-radius: 8px; 
             font-weight: bold; cursor: pointer; font-family: 'Cairo';
-            font-size: 16px; box-shadow: 0 4px #bf360c;
+            font-size: 14px; margin-top: 5px;
         }
-        .item-btn:active { transform: translateY(2px); box-shadow: 0 2px #bf360c; }
+        .shop-btn:hover { background: #e65100; }
 
-        /* منطقة اللعب المركزية */
-        .center-farm { 
+        /* منطقة العمل المركزية - واسعة جداً */
+        .farm-main-zone { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            gap: 30px;
+            gap: 20px;
+            padding: 10px;
+            overflow-y: auto;
         }
 
-        /* حقل الزراعة في المنتصف */
-        .crop-field { 
-            background: #5d4037; 
-            padding: 30px; 
-            border-radius: 25px; 
-            border: 10px solid #3e2723;
-            display: grid; 
-            grid-template-columns: repeat(4, 100px); 
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        /* ساحة الحيوانات الكبيرة */
+        .animal-safari { 
+            width: 100%; 
+            height: 300px; 
+            background: rgba(255,255,255,0.15); 
+            border: 4px dashed #fff; 
+            border-radius: 40px; 
+            position: relative;
+            overflow: hidden;
         }
-        .soil-plot { 
-            width: 100px; height: 100px; background: #6d4c41; 
+        .moving-entity { position: absolute; width: 70px; transition: all 3.5s linear; }
+
+        /* حقل الزراعة الضخم */
+        .field-grid { 
+            display: grid; 
+            grid-template-columns: repeat(6, 110px); /* 6 أعمدة لمساحة أكبر */
+            gap: 15px; 
+            background: #5d4037; 
+            padding: 25px; 
+            border-radius: 30px; 
+            border: 10px solid #3e2723;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        .soil { 
+            width: 110px; height: 110px; background: #6d4c41; 
             border-radius: 15px; cursor: pointer; position: relative; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 45px; border: 2px solid #3e2723;
+            font-size: 40px; border: 2px solid #3e2723;
         }
-        .soil-plot:hover { background: #795548; }
-        .grow-timer { position: absolute; bottom: 0; width: 100%; background: #000; color: #0f0; font-size: 12px; text-align: center; border-radius: 0 0 13px 13px; }
+        .timer-tag { position: absolute; bottom: 0; width: 100%; background: #000; color: #0f0; font-size: 12px; text-align: center; border-radius: 0 0 13px 13px; }
 
-        /* ساحة الدجاج */
-        .chicken-pen { 
-            width: 90%; height: 200px; background: rgba(255,255,255,0.1); 
-            border: 4px dashed #fff; border-radius: 30px; position: relative;
-        }
-        .chicken-entity { position: absolute; width: 85px; transition: all 3s linear; filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3)); }
-
-        /* الدردشة في الأسفل */
-        .bottom-chat-box { 
-            background: #e0f2f1; 
+        /* الدردشة في الأسفل بملء العرض */
+        .mega-chat-bar { 
             height: 150px; 
+            background: #e0f2f1; 
             border-top: 5px solid #00897B; 
             display: flex; 
             padding: 15px; 
-            gap: 15px;
+            gap: 20px;
         }
-        .chat-logs { 
-            flex: 1; background: white; border-radius: 12px; 
-            padding: 10px; overflow-y: auto; color: #333; 
-            border: 2px solid #ccc; font-size: 14px;
+        .chat-view { 
+            flex: 1; background: white; border-radius: 15px; 
+            padding: 15px; overflow-y: auto; color: #333; 
+            border: 2px solid #ccc;
         }
-        .chat-form { width: 250px; display: flex; flex-direction: column; gap: 10px; }
-        .chat-form input { padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Cairo'; }
+        .chat-inputs { width: 300px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-inputs input { padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-family: 'Cairo'; }
 
-        .sell-action-btn { 
-            background: #1565C0; color: white; padding: 15px 50px; 
-            border-radius: 50px; border: none; font-size: 22px; 
-            font-weight: 900; cursor: pointer; box-shadow: 0 6px #0D47A1;
+        .big-sell-btn { 
+            background: #1565C0; color: white; padding: 20px 60px; 
+            border-radius: 50px; border: none; font-size: 24px; 
+            font-weight: 900; cursor: pointer; box-shadow: 0 8px #0D47A1;
+            margin: 10px auto; display: block;
         }
 
-        #splash-screen { position: fixed; inset: 0; background: #1b5e20; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        #overlay { position: fixed; inset: 0; background: #1b5e20; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="splash-screen">
-    <div style="background:white; padding:50px; border-radius:30px; text-align:center; color:#333; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-        <h1 style="color:#2e7d32; margin-bottom:10px;">🚜 مزرعة الأساطير العربية</h1>
-        <p>قم بزراعة محاصيلك وتربية طيورك في أكبر مزرعة</p>
-        <input type="text" id="player-name" placeholder="اكتب اسمك هنا..." style="padding:15px; width:300px; font-family:'Cairo'; border:2px solid #2e7d32; border-radius:12px; font-size:18px; text-align:center;"><br><br>
-        <button onclick="initGame()" class="item-btn" style="background:#2e7d32; font-size:20px; width:200px;">دخول المزرعة</button>
+<div id="overlay">
+    <div style="background:white; padding:50px; border-radius:30px; text-align:center; width: 450px;">
+        <h1 style="color:#2e7d32;">🚜 المزرعة العربية الكبرى</h1>
+        <p style="color:#666;">أهلاً بك في عالم الزراعة والإنتاج</p>
+        <input type="text" id="p-name" placeholder="أدخل اسمك الكريم" style="padding:15px; width:100%; font-family:'Cairo'; border:2px solid #2e7d32; border-radius:12px; font-size:20px; text-align:center;"><br><br>
+        <button onclick="start()" class="shop-btn" style="height:60px; font-size:22px;">دخول المزرعة</button>
     </div>
 </div>
 
-<div class="top-stats">
-    <div class="stat-card">💰 الذهب: <span id="gold-val">1000</span></div>
-    <div class="stat-card">🥚 البيض: <span id="egg-val">0</span></div>
-    <div class="stat-card">🌱 البذور المتوفرة: <span id="seed-val">5</span></div>
-    <div class="stat-card">🌾 المحصول الجاهز: <span id="crop-val">0</span></div>
+<div class="top-stats-header">
+    <div class="stat-card">💰 الذهب: <span id="gold">1000</span></div>
+    <div class="stat-card">🥚 البيض: <span id="eggs">0</span></div>
+    <div class="stat-card">🥛 الحليب: <span id="milk">0</span></div>
+    <div class="stat-card">🌱 البذور: <span id="seeds">5</span></div>
+    <div class="stat-card">🌾 المخزن: <span id="crops">0</span></div>
 </div>
 
-<div class="main-world">
-    <div class="shop-sidebar">
-        <h2 style="text-align:center; margin-top:0;">🛒 المتجر</h2>
-        <button class="item-btn" onclick="shopAction('seed', 50)">🌱 شراء بذور (50 ذهبة)</button>
-        <button class="item-btn" onclick="shopAction('chicken', 200)">🐥 شراء دجاجة (200 ذهبة)</button>
-        <div style="margin-top:auto;">
-            <p style="font-size:12px; text-align:center;">* الدجاج ينتج بيضاً تلقائياً<br>* الزراعة تستغرق 3 دقائق</p>
+<div class="world-container">
+    <div class="mega-shop">
+        <h3 style="text-align:center; margin:0;">🛒 متجر الأدوات</h3>
+        
+        <div class="shop-item">
+            <span>🌱 بذور برسيم (5)</span>
+            <button class="shop-btn" onclick="buy('seeds', 50)">شراء بـ 50💰</button>
+        </div>
+        
+        <div class="shop-item">
+            <span>🐥 دجاجة بياضة</span>
+            <button class="shop-btn" onclick="buy('chicken', 200)">شراء بـ 200💰</button>
+        </div>
+
+        <div class="shop-item">
+            <span>🐄 بقرة حلوب</span>
+            <button class="shop-btn" onclick="buy('cow', 800)">شراء بـ 800💰</button>
+        </div>
+
+        <div class="shop-item">
+            <span>🚜 جرار آلي</span>
+            <button class="shop-btn" onclick="buy('tractor', 2000)">شراء بـ 2000💰</button>
         </div>
     </div>
 
-    <div class="center-farm">
-        <div class="chicken-pen" id="pen-area">
-            <h3 style="position:absolute; top:-40px; right:20px;">🐔 ساحة الدواجن</h3>
+    <div class="farm-main-zone">
+        <div class="animal-safari" id="safari">
+            <h4 style="margin:10px; color:white;">🐄 ساحة المواشي والطيور</h4>
         </div>
 
-        <div class="crop-field" id="farm-grid">
+        <div class="field-grid" id="grid">
             </div>
 
-        <button class="sell-action-btn" onclick="sellEverything()">💰 إيعان (بيع كل المحصول والإنتاج)</button>
+        <button class="big-sell-btn" onclick="sellAll()">💰 إيعان (بيع كل المنتجات)</button>
     </div>
 </div>
 
-<div class="bottom-chat-box">
-    <div class="chat-logs" id="chat-logs">
-        <div><b>النظام:</b> مرحباً بك في المزرعة الكبرى! ابدأ بالزراعة الآن.</div>
+<div class="mega-chat-bar">
+    <div class="chat-view" id="logs">
+        <div><b>النظام:</b> مرحباً بك! قم بشراء البذور وابدأ الزراعة.</div>
     </div>
-    <div class="chat-form">
-        <h4 style="margin:0; color:#004D40;">💬 الدردشة</h4>
-        <input type="text" id="msg-input" placeholder="اكتب رسالة للجميع...">
-        <button onclick="postChat()" class="item-btn" style="padding:8px; font-size:14px; background:#00897B; box-shadow: 0 4px #004D40;">إرسال</button>
+    <div class="chat-inputs">
+        <input type="text" id="chat-in" placeholder="اكتب رسالة للمزارعين...">
+        <button onclick="sendChat()" class="shop-btn" style="background:#00897B; margin:0;">إرسال</button>
     </div>
 </div>
 
 <script>
-    let farm = { gold: 1000, eggs: 0, seeds: 5, crops: 0, chickens: 0 };
-    const REAL_CHICKEN_URL = "https://m.media-amazon.com/images/I/41-N7X0-1lL._AC_.jpg";
-
-    function initGame() {
-        if(!document.getElementById('player-name').value) return alert("يرجى إدخال اسمك");
-        document.getElementById('splash-screen').classList.add('hidden');
-        createGrid();
+    let farm = { gold: 1000, eggs: 0, milk: 0, seeds: 5, crops: 0, chickens: 0, cows: 0 };
+    
+    function start() {
+        if(!document.getElementById('p-name').value) return;
+        document.getElementById('overlay').classList.add('hidden');
+        initGrid();
         setInterval(moveAnimals, 3000);
-        setInterval(() => { 
-            if(farm.chickens > 0) { 
-                farm.eggs += farm.chickens; 
-                updateUI(); 
-            } 
+        // الإنتاج التلقائي كل 10 ثواني
+        setInterval(() => {
+            if(farm.chickens > 0) farm.eggs += farm.chickens;
+            if(farm.cows > 0) farm.milk += farm.cows;
+            updateUI();
         }, 10000);
     }
 
-    function createGrid() {
-        const grid = document.getElementById('farm-grid');
-        for(let i=0; i<12; i++) {
-            let p = document.createElement('div');
-            p.className = 'soil-plot';
-            p.onclick = () => startPlanting(p);
-            grid.appendChild(p);
+    function initGrid() {
+        const grid = document.getElementById('grid');
+        for(let i=0; i<18; i++) {
+            let s = document.createElement('div');
+            s.className = 'soil';
+            s.onclick = () => plant(s);
+            grid.appendChild(s);
         }
     }
 
-    function startPlanting(p) {
-        if(p.innerHTML === "" && farm.seeds > 0) {
-            farm.seeds--; 
-            p.innerHTML = "🌱";
+    function plant(s) {
+        if(s.innerHTML === "" && farm.seeds > 0) {
+            farm.seeds--; s.innerHTML = "🌱";
             let time = 180; // 3 دقائق
-            let lbl = document.createElement('div');
-            lbl.className = 'grow-timer';
-            p.appendChild(lbl);
+            let t = document.createElement('div'); t.className = 'timer-tag'; s.appendChild(t);
             updateUI();
-
-            let countdown = setInterval(() => {
+            let count = setInterval(() => {
                 time--;
-                let m = Math.floor(time/60), s = time%60;
-                lbl.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                t.innerText = `${Math.floor(time/60)}:${time%60 < 10 ? '0'+time%60 : time%60}`;
                 if(time <= 0) {
-                    clearInterval(countdown);
-                    p.innerHTML = "🌿"; // نضج المحصول
-                    p.onclick = () => { 
-                        farm.crops++; 
-                        p.innerHTML = ""; 
-                        p.onclick = () => startPlanting(p); 
-                        updateUI(); 
-                        addToChat("أنت", "لقد قمت بحصاد حزمة من البرسيم!");
+                    clearInterval(count); s.innerHTML = "🌾";
+                    s.onclick = () => { 
+                        farm.crops++; s.innerHTML = ""; s.onclick = () => plant(s); updateUI();
+                        log("أنت", "حصدت محصولاً طازجاً!");
                     };
                 }
             }, 1000);
-        } else if (farm.seeds <= 0 && p.innerHTML === "") {
-            alert("لا توجد بذور! اطلب من المتجر.");
-        }
+        } else if(farm.seeds <= 0) alert("لا يوجد بذور! اشتري من المتجر.");
     }
 
-    function shopAction(item, cost) {
-        if(farm.gold >= cost) {
-            farm.gold -= cost;
-            if(item === 'seed') farm.seeds += 5;
-            if(item === 'chicken') {
-                farm.chickens++;
-                let img = document.createElement('img');
-                img.src = REAL_CHICKEN_URL;
-                img.className = 'chicken-entity';
-                img.style.left = "50%"; img.style.top = "50%";
-                document.getElementById('pen-area').appendChild(img);
-            }
+    function buy(item, price) {
+        if(farm.gold >= price) {
+            farm.gold -= price;
+            if(item === 'seeds') farm.seeds += 5;
+            if(item === 'chicken') { farm.chickens++; addAnimal('https://m.media-amazon.com/images/I/41-N7X0-1lL._AC_.jpg'); }
+            if(item === 'cow') { farm.cows++; addAnimal('https://i.ibb.co/r76k84M/cow-walk.gif'); }
+            if(item === 'tractor') log("النظام", "اشتريت جراراً! الإنتاج أصبح أسرع ذهنياً.");
             updateUI();
-            addToChat("المتجر", `مبروك! تم شراء ${item === 'seed' ? 'بذور' : 'دجاجة'}.`);
-        } else {
-            alert("الذهب لا يكفي!");
-        }
+            log("المتجر", `تم شراء ${item} بنجاح.`);
+        } else alert("الذهب غير كافٍ!");
+    }
+
+    function addAnimal(url) {
+        let img = document.createElement('img');
+        img.src = url; img.className = 'moving-entity';
+        img.style.left = "50%"; img.style.top = "50%";
+        document.getElementById('safari').appendChild(img);
     }
 
     function moveAnimals() {
-        let chickens = document.getElementsByClassName('chicken-entity');
-        for(let c of chickens) {
-            c.style.left = Math.random() * 85 + "%";
-            c.style.top = Math.random() * 65 + "%";
+        let items = document.getElementsByClassName('moving-entity');
+        for(let i of items) {
+            i.style.left = Math.random() * 90 + "%";
+            i.style.top = Math.random() * 70 + "%";
         }
     }
 
-    function sellEverything() {
-        let profit = (farm.eggs * 25) + (farm.crops * 70);
-        if(profit > 0) {
-            farm.gold += profit;
-            farm.eggs = 0; 
-            farm.crops = 0;
-            updateUI();
-            addToChat("أنت", `بعت كل شيء وربحت ${profit} ذهبة!`);
-            alert("تم بيع الإنتاج وربح " + profit + " 💰");
-        } else {
-            alert("لا يوجد إنتاج لبيعه حالياً!");
-        }
+    function sellAll() {
+        let total = (farm.eggs * 20) + (farm.milk * 50) + (farm.crops * 70);
+        if(total > 0) {
+            farm.gold += total; farm.eggs = 0; farm.milk = 0; farm.crops = 0;
+            updateUI(); log("أنت", `بعت كل شيء مقابل ${total} ذهبة!`);
+            alert("تم البيع بنجاح! 💰");
+        } else alert("لا يوجد شيء لبيعه!");
     }
 
-    function postChat() {
-        let input = document.getElementById('msg-input');
-        if(input.value) {
-            addToChat("أنت", input.value);
-            input.value = "";
-        }
+    function sendChat() {
+        let i = document.getElementById('chat-in');
+        if(i.value) { log("أنت", i.value); i.value = ""; }
     }
 
-    function addToChat(user, text) {
-        let logs = document.getElementById('chat-logs');
-        logs.innerHTML += `<div><b>${user}:</b> ${text}</div>`;
-        logs.scrollTop = logs.scrollHeight;
+    function log(user, text) {
+        let l = document.getElementById('logs');
+        l.innerHTML += `<div><b>${user}:</b> ${text}</div>`;
+        l.scrollTop = l.scrollHeight;
     }
 
     function updateUI() {
-        document.getElementById('gold-val').innerText = farm.gold;
-        document.getElementById('egg-val').innerText = farm.eggs;
-        document.getElementById('seed-val').innerText = farm.seeds;
-        document.getElementById('crop-val').innerText = farm.crops;
+        document.getElementById('gold').innerText = farm.gold;
+        document.getElementById('eggs').innerText = farm.eggs;
+        document.getElementById('milk').innerText = farm.milk;
+        document.getElementById('seeds').innerText = farm.seeds;
+        document.getElementById('crops').innerText = farm.crops;
     }
 </script>
 </body>
