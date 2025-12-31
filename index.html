@@ -2,41 +2,41 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعة الأساطير V7 - نظام الأبقار والمتجر الشامل</title>
+    <title>مزرعة الأساطير V9 - التحدي الصعب</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         
         body { background: #1b5e20; height: 100vh; overflow: hidden; display: flex; flex-direction: column; color: white; }
 
-        /* العدادات العلوية */
         .hud {
-            height: 80px; background: rgba(0,0,0,0.85); display: flex;
-            justify-content: space-around; align-items: center; border-bottom: 4px solid #ffd700;
+            height: 70px; background: rgba(0,0,0,0.85); display: flex;
+            justify-content: space-around; align-items: center; border-bottom: 3px solid #ffd700;
         }
-        .stat { background: #fff; color: #2e7d32; padding: 5px 12px; border-radius: 10px; border: 2px solid #ffd700; font-weight: 900; min-width: 100px; text-align: center; font-size: 13px; }
+        .stat { background: #fff; color: #2e7d32; padding: 5px 15px; border-radius: 10px; border: 2px solid #ffd700; font-weight: 900; min-width: 120px; text-align: center; font-size: 13px; }
         
-        .xp-box { text-align: center; width: 200px; }
+        .xp-box { text-align: center; width: 220px; }
         .xp-bg { width: 100%; height: 10px; background: #333; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         .xp-bar { width: 0%; height: 100%; background: #00bcd4; transition: 0.4s; }
 
-        /* المزرعة */
         .farm-world { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(#4caf50, #1b5e20); }
         .grid {
-            display: grid; grid-template-columns: repeat(8, 90px); gap: 8px;
-            padding: 15px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 5px solid #3e2723;
+            display: grid; grid-template-columns: repeat(6, 100px); gap: 10px;
+            padding: 20px; background: rgba(0,0,0,0.2); border-radius: 20px; border: 4px solid #3e2723;
         }
+        
         .soil {
-            width: 90px; height: 90px; background: #6d4c41; border-radius: 10px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; border: 1px solid #3e2723; position: relative;
+            width: 100px; height: 100px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 35px; position: relative; transition: 0.3s;
         }
+        .unlocked { background: #6d4c41; border: 2px solid #3e2723; cursor: pointer; }
+        .locked { background: rgba(0,0,0,0.5); border: 2px dashed #666; cursor: not-allowed; color: #aaa; font-size: 20px; }
 
-        /* المتجر المتطور */
         .side-shop { 
-            position: fixed; right: 10px; top: 90px; bottom: 90px; width: 210px; 
+            position: fixed; right: 10px; top: 80px; bottom: 80px; width: 220px; 
             background: rgba(255,255,255,0.95); padding: 15px; border-radius: 20px; 
-            border: 3px solid #2e7d32; color: #333; display: flex; flex-direction: column; gap: 10px;
+            border: 3px solid #2e7d32; color: #333; display: flex; flex-direction: column; gap: 8px;
         }
         .shop-btn {
             width: 100%; padding: 10px; border: none; border-radius: 10px; 
@@ -44,18 +44,11 @@
             color: white; transition: 0.2s;
         }
         .b-seed { background: #ff9800; }
-        .b-tractor { background: #f44336; }
-        .b-tree { background: #4caf50; }
-        .b-cow { background: #795548; }
-        .b-sell { background: #2196f3; margin-top: auto; border: 2px solid #0d47a1; }
-        .shop-btn:disabled { background: #bbb !important; cursor: not-allowed; opacity: 0.7; }
+        .b-expand { background: #9c27b0; border: 2px solid #4a148c; }
+        .b-sell { background: #2196f3; margin-top: auto; }
+        .shop-btn:disabled { background: #bbb !important; cursor: not-allowed; }
 
-        /* المحادثة */
-        .chat-mini { 
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
-            width: 300px; background: rgba(0,0,0,0.8); padding: 5px; 
-            border-radius: 10px 10px 0 0; border: 1px solid #ffd700; font-size: 11px;
-        }
+        .price-tag { display: block; font-size: 11px; font-weight: bold; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -68,111 +61,118 @@
         </div>
         <div class="stat">🌱 بذور: <span id="seeds">10</span></div>
         <div class="stat">🌾 مخزن: <span id="inv">0</span></div>
-        <div class="stat">🥛 حليب: <span id="milk">0</span></div>
     </div>
 
     <div class="side-shop">
-        <h3 style="text-align: center;">🛒 متجر المزرعة</h3>
-        <button class="shop-btn b-seed" onclick="buySeeds()">🌱 بذور (50💰)</button>
-        <button id="btn-tractor" class="shop-btn b-tractor" onclick="useTractor()" disabled>🚜 الجرار (مستوى 2)</button>
-        <button id="btn-tree" class="shop-btn b-tree" onclick="buyTree()" disabled>🍎 شجرة (1000💰)</button>
-        <button id="btn-cow" class="shop-btn b-cow" onclick="buyCow()" disabled>🐄 بقرة (2500💰)</button>
-        <button class="shop-btn b-sell" onclick="sellAll()">💰 بيع كل الإنتاج</button>
+        <h3 style="text-align: center; color: #2e7d32;">🛒 المتجر الملكي</h3>
+        <button class="shop-btn b-seed" onclick="buySeeds()">🌱 بذور فاخرة <span class="price-tag">100💰</span></button>
+        
+        <button id="btn-expand" class="shop-btn b-expand" onclick="expandFarm()">
+            🏗️ شراء أرض جديدة 
+            <span class="price-tag" id="expand-cost">2000💰</span>
+        </button>
+
+        <button class="shop-btn b-sell" onclick="sellAll()">💰 بيع المحاصيل</button>
+        <p style="font-size: 10px; text-align: center; color: #666; margin-top: 10px;" id="land-count">الأراضي: 6/24</p>
     </div>
 
     <div class="farm-world"><div class="grid" id="grid"></div></div>
 
-    <div class="chat-mini"><div id="logs" style="height:30px; overflow:hidden;"><b>النظام:</b> مرحباً! طور مزرعتك لتفتح الأبقار.</div></div>
-
 <script>
-    let farm = JSON.parse(localStorage.getItem('farm_v7')) || { 
-        gold: 1000, seeds: 10, inv: 0, milk: 0, xp: 0, lvl: 1, trees: 0, cows: 0 
+    let farm = JSON.parse(localStorage.getItem('farm_v9')) || { 
+        gold: 1000, seeds: 10, inv: 0, xp: 0, lvl: 1, unlockedPlots: 6 
     };
 
     function update() {
-        document.getElementById('gold').innerText = Math.floor(farm.gold);
+        document.getElementById('gold').innerText = farm.gold;
         document.getElementById('seeds').innerText = farm.seeds;
         document.getElementById('inv').innerText = farm.inv;
-        document.getElementById('milk').innerText = farm.milk;
         document.getElementById('lvl').innerText = farm.lvl;
+        document.getElementById('land-count').innerText = `الأراضي المفتوحة: ${farm.unlockedPlots}/24`;
+        
+        // حساب سعر التوسعة (سعر مرتفع وتصاعدي)
+        // الأرض السابعة بـ 2000، الثامنة بـ 3500، وهكذا
+        let expandCost = 2000 + (farm.unlockedPlots - 6) * 1500;
+        document.getElementById('expand-cost').innerText = `${expandCost}💰`;
         
         let nextXp = farm.lvl * 600;
         document.getElementById('xp-bar').style.width = (farm.xp / nextXp * 100) + "%";
 
-        // تحديث الأزرار
-        document.getElementById('btn-tractor').disabled = (farm.lvl < 2);
-        document.getElementById('btn-tree').disabled = (farm.lvl < 3 || farm.gold < 1000);
-        document.getElementById('btn-cow').disabled = (farm.lvl < 4 || farm.gold < 2500);
+        document.getElementById('btn-expand').disabled = (farm.gold < expandCost || farm.unlockedPlots >= 24);
         
-        localStorage.setItem('farm_v7', JSON.stringify(farm));
+        localStorage.setItem('farm_v9', JSON.stringify(farm));
     }
 
-    const grid = document.getElementById('grid');
-    for(let i=0; i<32; i++) {
-        let s = document.createElement('div');
-        s.className = 'soil';
-        s.onclick = () => {
-            if(s.innerHTML === "" && farm.seeds > 0) {
-                farm.seeds--; s.innerHTML = "🌱"; update();
-                setTimeout(() => { s.innerHTML = "🌾"; }, 3000);
-            } else if(s.innerHTML === "🌾") {
-                s.innerHTML = ""; farm.inv++; farm.xp += 60;
-                checkLvl(); update();
+    function drawGrid() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "";
+        for(let i=0; i<24; i++) {
+            let s = document.createElement('div');
+            if(i < farm.unlockedPlots) {
+                s.className = "soil unlocked";
+                s.onclick = () => handleSoil(s);
+            } else {
+                s.className = "soil locked";
+                s.innerHTML = "🔒";
             }
-        };
-        grid.appendChild(s);
-    }
-
-    function useTractor() {
-        let count = 0;
-        const soils = document.getElementsByClassName('soil');
-        for(let s of soils) { if(s.innerHTML === "🌾") { s.innerHTML = ""; count++; } }
-        if(count > 0) { farm.inv += count; farm.xp += count * 60; checkLvl(); update(); }
-    }
-
-    function buyTree() {
-        if(farm.gold >= 1000) {
-            farm.gold -= 1000; farm.trees++; update();
-            const soils = document.getElementsByClassName('soil');
-            for(let s of soils) { if(s.innerHTML === "") { s.innerHTML = "🍎"; break; } }
+            grid.appendChild(s);
         }
     }
 
-    function buyCow() {
-        if(farm.gold >= 2500) {
-            farm.gold -= 2500; farm.cows++; update();
-            const soils = document.getElementsByClassName('soil');
-            for(let s of soils) { if(s.innerHTML === "") { s.innerHTML = "🐄"; break; } }
+    function handleSoil(s) {
+        if(s.innerHTML === "" && farm.seeds > 0) {
+            farm.seeds--; s.innerHTML = "🌱"; update();
+            setTimeout(() => { s.innerHTML = "🌾"; }, 3500);
+        } else if(s.innerHTML === "🌾") {
+            s.innerHTML = ""; farm.inv++; farm.xp += 70;
+            checkLvl(); update();
         }
     }
 
-    // الربح التلقائي (أشجار + أبقار)
-    setInterval(() => {
-        if(farm.trees > 0) { farm.gold += (farm.trees * 25); }
-        if(farm.cows > 0) { farm.milk += (farm.cows * 1); }
-        update();
-    }, 8000);
+    function expandFarm() {
+        let expandCost = 2000 + (farm.unlockedPlots - 6) * 1500;
+        if(farm.gold >= expandCost) {
+            farm.gold -= expandCost;
+            farm.unlockedPlots++;
+            
+            // نظام المكافأة عند التوسع
+            let reward = "";
+            if(Math.random() < 0.3) {
+                let gift = 500;
+                farm.gold += gift;
+                reward = `\n🎁 وجدت كنزاً مدفوناً يحتوي على ${gift} ذهبة!`;
+            }
 
-    function checkLvl() {
-        if(farm.xp >= (farm.lvl * 600)) {
-            farm.lvl++; farm.xp = 0; farm.gold += 1500; update();
-            alert(`🎉 مبروك! وصلت للمستوى ${farm.lvl}`);
+            drawGrid();
+            update();
+            alert(`🎊 مبروك! قمت بتوسعة المزرعة بسعر ${expandCost} ذهبة.${reward}`);
         }
     }
 
     function buySeeds() {
-        if(farm.gold >= 50) { farm.gold -= 50; farm.seeds += 5; update(); }
+        if(farm.gold >= 100) { farm.gold -= 100; farm.seeds += 5; update(); }
+        else { alert("لا تملك ذهباً كافياً للبذور!"); }
     }
 
     function sellAll() {
-        let money = (farm.inv * 100) + (farm.milk * 250);
-        if(money > 0) {
-            farm.gold += money; farm.inv = 0; farm.milk = 0;
+        if(farm.inv > 0) {
+            let money = farm.inv * 150; // سعر بيع مرتفع لتعويض تكلفة التوسع
+            farm.gold += money; farm.inv = 0;
             update();
-            alert(`💰 بعت المحصول والحليب وربحت ${money} ذهبة!`);
+            alert(`💰 بعت المحاصيل بـ ${money} ذهبة! استمر في الجمع للتوسعة.`);
         }
     }
 
+    function checkLvl() {
+        let nextXp = farm.lvl * 600;
+        if(farm.xp >= nextXp) {
+            farm.lvl++; farm.xp = 0; farm.gold += 1200;
+            update();
+            alert(`⭐ المستوى ${farm.lvl}! زادت شهرتك وحصلت على مكافأة ملكية.`);
+        }
+    }
+
+    drawGrid();
     update();
 </script>
 </body>
