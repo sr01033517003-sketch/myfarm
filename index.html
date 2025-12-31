@@ -2,206 +2,164 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مزرعة الأساطير الحقيقية</title>
+    <title>مزرعة الأساطير الواقعية</title>
     <style>
-        body { background: #2e7d32; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; color: white; overflow-x: hidden; }
-        .top-bar { background: #1b5e20; padding: 15px; display: flex; justify-content: space-around; border-bottom: 4px solid #ffd700; position: sticky; top: 0; z-index: 1000; }
-        .stat-box { background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 20px; border: 1px solid #ffd700; font-weight: bold; font-size: 18px; }
+        body { background: #2e7d32; font-family: 'Segoe UI'; margin: 0; color: white; text-align: center; }
+        .top-bar { background: #1b5e20; padding: 10px; display: flex; justify-content: space-around; border-bottom: 4px solid #ffd700; position: sticky; top: 0; z-index: 1000; }
+        .stat-box { background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #ffd700; font-weight: bold; }
         
         .game-world { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
         
-        /* منطقة الحيوانات */
-        .zone { background: #81c784; border: 6px solid #5d4037; border-radius: 25px; padding: 15px; min-width: 300px; min-height: 250px; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .zone-title { background: #5d4037; color: white; padding: 5px 15px; border-radius: 10px; position: absolute; top: -15px; right: 20px; font-weight: bold; }
-        
-        .animal { position: absolute; font-size: 40px; transition: all 3s ease-in-out; cursor: pointer; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2)); }
+        /* ساحة الحيوانات بصور حقيقية */
+        .zone { background-image: url('https://img.freepik.com/free-vector/pixel-art-grass-background_52683-113066.jpg'); background-size: cover; border: 6px solid #5d4037; border-radius: 25px; min-width: 320px; min-height: 280px; position: relative; overflow: hidden; }
+        .animal-img { position: absolute; width: 60px; height: 60px; transition: all 3s ease-in-out; filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.3)); }
 
         /* منطقة الزراعة */
-        .farm-grid { display: grid; grid-template-columns: repeat(4, 70px); gap: 10px; background: #4caf50; border: 8px solid #3e2723; border-radius: 20px; padding: 15px; }
-        .plot { width: 70px; height: 70px; background: #5d4037; border-radius: 8px; border: 2px solid #3d1c02; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; position: relative; }
-        .timer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: #00ff00; font-size: 10px; text-align: center; border-radius: 0 0 5px 5px; }
+        .farm-grid { display: grid; grid-template-columns: repeat(4, 75px); gap: 10px; background: #4caf50; border: 8px solid #3e2723; border-radius: 20px; padding: 15px; }
+        .plot { width: 75px; height: 75px; background: #5d4037; border: 2px solid #3d1c02; border-radius: 10px; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 35px; }
+        .timer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #00ff00; font-size: 11px; border-radius: 0 0 8px 8px; }
 
-        /* منطقة الآلات */
-        .machine-slot { width: 80px; height: 80px; background: #cfd8dc; border: 3px dashed #37474f; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 40px; margin: 5px; }
-
-        .shop-panel { background: white; color: #333; width: 100%; max-width: 900px; margin: 20px auto; border-radius: 20px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
-        .shop-item { border: 2px solid #eee; padding: 10px; border-radius: 15px; text-align: center; }
-        .btn-buy { background: #e67e22; color: white; border: none; padding: 8px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        .btn-sell { background: #2ecc71; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 5px #27ae60; margin-bottom: 20px; }
-        .btn-sell:active { transform: translateY(3px); box-shadow: none; }
-
-        #login-screen { position: fixed; inset: 0; background: #2e7d32; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .shop-panel { background: white; color: #333; max-width: 900px; margin: 20px auto; border-radius: 20px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .btn-buy { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div style="background:white; color:black; padding:40px; border-radius:30px; text-align:center; box-shadow: 0 0 30px rgba(0,0,0,0.5);">
-            <h1 style="color:#2e7d32; margin-bottom:10px;">🚜 المزرعة السعيدة V10</h1>
-            <p>أدخل اسمك لفتح بوابات المزرعة</p>
-            <input type="text" id="username" placeholder="اسمك هنا..." style="padding:15px; width:250px; border-radius:10px; border:2px solid #2e7d32; font-size:18px;"><br><br>
-            <button onclick="login()" style="padding:15px 60px; background:#ffd700; color:#333; border:none; border-radius:15px; font-weight:bold; font-size:20px; cursor:pointer;">دخول الآن</button>
+<div id="login-screen" style="position:fixed; inset:0; background:#2e7d32; z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:white; color:black; padding:40px; border-radius:30px; text-align:center;">
+        <h2>🌾 المزرعة الواقعية V11</h2>
+        <input type="text" id="username" placeholder="اسمك هنا" style="padding:12px; width:220px; font-size:18px;"><br><br>
+        <button onclick="login()" style="padding:15px 50px; background:#ffd700; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">دخول</button>
+    </div>
+</div>
+
+<div id="game-ui" class="hidden">
+    <div class="top-bar">
+        <div class="stat-box">💰 <span id="gold-val">0</span></div>
+        <div class="stat-box">⭐ مستوى: <span id="lvl-val">1</span></div>
+        <div class="stat-box">🍯 عسل: <span id="honey-val">0</span></div>
+    </div>
+
+    <div class="game-world">
+        <div class="zone" id="animal-zone">
+            <div style="background:#5d4037; color:white; padding:5px; position:absolute; top:0; width:100%; font-size:12px;">ساحة المواشي الواقعية</div>
+        </div>
+
+        <div class="zone" style="background:#5d4037; min-width:auto;">
+            <div class="farm-grid" id="grid"></div>
         </div>
     </div>
 
-    <div id="game-ui" class="hidden">
-        <div class="top-bar">
-            <div class="stat-box">💰 ذهب: <span id="gold-val">0</span></div>
-            <div class="stat-box">⭐ مستوى: <span id="lvl-val">1</span></div>
-            <div class="stat-box">🍯 عسل: <span id="honey-val">0</span></div>
+    <button onclick="sellAll()" style="background:#2ecc71; color:white; padding:15px 60px; border:none; border-radius:50px; font-size:20px; font-weight:bold; cursor:pointer; margin:20px;">💰 بيع كل الإنتاج 💰</button>
+
+    <div class="shop-panel">
+        <div style="text-align:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1864/1864470.png" width="50"><br>
+            دجاجة (100 💰) <button class="btn-buy" onclick="buy('chicken', 100)">شراء</button>
         </div>
-
-        <div class="game-world">
-            <div class="zone" id="animal-zone">
-                <div class="zone-title">🐄 ساحة المواشي والطيور</div>
-            </div>
-
-            <div class="zone" style="background:#5d4037; min-width:auto;">
-                <div class="zone-title">🌱 الأرض الزراعية</div>
-                <div class="farm-grid" id="grid"></div>
-            </div>
-
-            <div class="zone" id="machine-zone" style="background:#90a4ae;">
-                <div class="zone-title">🏭 منطقة الآلات والمصانع</div>
-                <div id="machine-list"></div>
-            </div>
+        <div style="text-align:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" width="50"><br>
+            بقرة (500 💰) <button class="btn-buy" onclick="buy('cow', 500)">شراء</button>
         </div>
-
-        <center>
-            <button class="btn-sell" onclick="sellEverything()">💰 بيع كل الإنتاج 💰</button>
-        </center>
-
-        <div class="shop-panel">
-            <div class="shop-item">🐥 دجاجة<br>100 💰<button class="btn-buy" onclick="buy('🐥', 100, 'animal')">شراء</button></div>
-            <div class="shop-item">🐄 بقرة<br>500 💰<button class="btn-buy" onclick="buy('🐄', 500, 'animal')">شراء</button></div>
-            <div class="shop-item">🐝 خلية نحل<br>1200 💰<button class="btn-buy" onclick="buy('🐝', 1200, 'machine')">شراء</button></div>
-            <div class="shop-item">🚜 جرار<br>2000 💰<button class="btn-buy" onclick="buy('🚜', 2000, 'machine')">شراء</button></div>
-            <div class="shop-item">🏭 مصنع<br>4000 💰<button class="btn-buy" onclick="buy('🏭', 4000, 'machine')">شراء</button></div>
+        <div style="text-align:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2153/2153282.png" width="50"><br>
+            خلية نحل (1200 💰) <button class="btn-buy" onclick="buy('bee', 1200)">شراء</button>
         </div>
     </div>
+</div>
 
-    <script>
-        let farm = { user: "", gold: 2000, lvl: 1, inv: 0, honey: 0, ownedAnimals: [], ownedMachines: [] };
-        const GROWTH_TIME = 180; // 3 دقائق
+<script>
+    let farm = { user: "", gold: 2000, lvl: 1, inv: 0, honey: 0, animals: [] };
+    const IMAGES = {
+        chicken: 'https://i.pinimg.com/originals/f3/d9/04/f3d904f981459a96e95b078a94665476.gif',
+        cow: 'https://media.tenor.com/images/73e273069176f140685970c06f366e6a/tenor.gif',
+        bee: 'https://cdn-icons-png.flaticon.com/512/2153/2153282.png'
+    };
 
-        function login() {
-            let u = document.getElementById('username').value.trim();
-            if(!u) return;
-            let saved = localStorage.getItem('master_farm_v10_' + u);
-            if(saved) farm = JSON.parse(saved);
-            else farm.user = u;
-            
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('game-ui').classList.remove('hidden');
-            
-            initGrid();
-            farm.ownedAnimals.forEach(a => renderAnimal(a));
-            farm.ownedMachines.forEach(m => renderMachine(m));
-            updateUI();
-            
-            setInterval(moveAnimals, 4000);
-            setInterval(() => {
-                let hives = farm.ownedMachines.filter(m => m === '🐝').length;
-                if(hives > 0) { farm.honey += hives; updateUI(); }
-            }, 10000);
+    function login() {
+        let u = document.getElementById('username').value.trim();
+        if(!u) return;
+        let saved = localStorage.getItem('real_farm_v11_' + u);
+        if(saved) farm = JSON.parse(saved); else farm.user = u;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('game-ui').classList.remove('hidden');
+        initGrid();
+        farm.animals.forEach(type => renderAnimal(type));
+        updateUI();
+        setInterval(moveAnimals, 4000);
+    }
+
+    function initGrid() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "";
+        for(let i=0; i<16; i++) {
+            let p = document.createElement('div');
+            p.className = 'plot';
+            p.onclick = () => plant(p);
+            grid.appendChild(p);
         }
+    }
 
-        function initGrid() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = "";
-            for(let i=0; i<16; i++) {
-                let p = document.createElement('div');
-                p.className = 'plot';
-                p.onclick = () => plant(p);
-                grid.appendChild(p);
-            }
-        }
-
-        function plant(p) {
-            if(p.innerText === "") {
-                p.innerText = "🌱";
-                let timeLeft = GROWTH_TIME;
-                let timer = document.createElement('div');
-                timer.className = 'timer';
-                p.appendChild(timer);
-
-                let countdown = setInterval(() => {
-                    timeLeft--;
-                    let mins = Math.floor(timeLeft / 60);
-                    let secs = timeLeft % 60;
-                    timer.innerText = `${mins}:${secs < 10 ? '0'+secs : secs}`;
-
-                    if(timeLeft <= 0) {
-                        clearInterval(countdown);
-                        let crops = ["🌿", "🌾", "🍅", "🌽", "🍓"];
-                        p.innerText = crops[Math.floor(Math.random() * crops.length)];
-                        p.onclick = () => {
-                            farm.inv++;
-                            p.innerText = "";
-                            p.onclick = () => plant(p);
-                            updateUI();
-                        };
-                    }
-                }, 1000);
-            }
-        }
-
-        function buy(item, price, type) {
-            if(farm.gold >= price) {
-                farm.gold -= price;
-                if(type === 'animal') {
-                    farm.ownedAnimals.push(item);
-                    renderAnimal(item);
-                } else {
-                    farm.ownedMachines.push(item);
-                    renderMachine(item);
+    function plant(p) {
+        if(p.innerText === "") {
+            p.innerText = "🌱";
+            let timeLeft = 180;
+            let timer = document.createElement('div');
+            timer.className = 'timer';
+            p.appendChild(timer);
+            let count = setInterval(() => {
+                timeLeft--;
+                timer.innerText = Math.floor(timeLeft/60) + ":" + (timeLeft%60).toString().padStart(2,'0');
+                if(timeLeft <= 0) {
+                    clearInterval(count);
+                    p.innerText = "🌾";
+                    p.onclick = () => { farm.inv++; p.innerText = ""; p.onclick = () => plant(p); updateUI(); };
                 }
-                updateUI();
-            } else { alert("الذهب لا يكفي!"); }
+            }, 1000);
         }
+    }
 
-        function renderAnimal(emoji) {
-            let a = document.createElement('div');
-            a.className = 'animal';
-            a.innerText = emoji;
-            a.style.left = "50%"; a.style.top = "50%";
-            document.getElementById('animal-zone').appendChild(a);
-        }
+    function buy(type, price) {
+        if(farm.gold >= price) {
+            farm.gold -= price;
+            farm.animals.push(type);
+            renderAnimal(type);
+            updateUI();
+        } else { alert("الذهب لا يكفي!"); }
+    }
 
-        function renderMachine(emoji) {
-            let m = document.createElement('div');
-            m.className = 'machine-slot';
-            m.innerText = emoji;
-            document.getElementById('machine-list').appendChild(m);
-        }
+    function renderAnimal(type) {
+        let img = document.createElement('img');
+        img.src = IMAGES[type];
+        img.className = 'animal-img';
+        img.style.left = Math.random() * 80 + "%";
+        img.style.top = Math.random() * 80 + "%";
+        document.getElementById('animal-zone').appendChild(img);
+    }
 
-        function moveAnimals() {
-            let animals = document.getElementsByClassName('animal');
-            for(let a of animals) {
-                a.style.left = Math.random() * 80 + 5 + "%";
-                a.style.top = Math.random() * 80 + 5 + "%";
-            }
+    function moveAnimals() {
+        let animals = document.getElementsByClassName('animal-img');
+        for(let a of animals) {
+            a.style.left = Math.random() * 80 + "%";
+            a.style.top = Math.random() * 80 + "%";
         }
+    }
 
-        function sellEverything() {
-            let total = (farm.inv * 200) + (farm.honey * 500);
-            if(total > 0) {
-                farm.gold += total;
-                farm.inv = 0; farm.honey = 0;
-                farm.lvl = Math.floor(farm.gold / 5000) + 1;
-                updateUI();
-                alert("تم بيع الإنتاج بنجاح!");
-            }
+    function sellAll() {
+        let profit = (farm.inv * 200) + (farm.honey * 500);
+        if(profit > 0) {
+            farm.gold += profit; farm.inv = 0; farm.honey = 0;
+            updateUI();
+            alert("تم البيع بنجاح!");
         }
+    }
 
-        function updateUI() {
-            document.getElementById('gold-val').innerText = farm.gold;
-            document.getElementById('lvl-val').innerText = farm.lvl;
-            document.getElementById('honey-val').innerText = farm.honey;
-            localStorage.setItem('master_farm_v10_' + farm.user, JSON.stringify(farm));
-        }
-    </script>
+    function updateUI() {
+        document.getElementById('gold-val').innerText = farm.gold;
+        document.getElementById('lvl-val').innerText = Math.floor(farm.gold / 5000) + 1;
+        localStorage.setItem('real_farm_v11_' + farm.user, JSON.stringify(farm));
+    }
+</script>
 </body>
-        </html>
+    </html>
