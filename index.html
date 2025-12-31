@@ -1,243 +1,260 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مزرعتي الاحترافية - النسخة الشاملة</title>
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
-    
-    :root {
-        --primary: #2e7d32;
-        --secondary: #1b5e20;
-        --accent: #ffd700;
-        --brown: #5d4037;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزرعة الأساطير - النسخة العربية</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 
-    body { 
-        margin:0; font-family: 'Cairo', sans-serif; background:#3e2723; color:white; 
-        text-align:center; padding-bottom: 200px; user-select: none;
-    }
+        body { 
+            background: #4CAF50;
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            color: #333; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+        }
 
-    /* شريط المهام الجديد */
-    .quest-bar {
-        background: linear-gradient(45deg, #fbc02d, #f57f17);
-        color: #000; padding: 8px; font-weight: 900; font-size: 14px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 2px solid #fff;
-    }
+        /* شريط الأدوات العلوي */
+        .top-bar {
+            background: #8BC34A;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #689F38;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .top-bar .section { display: flex; align-items: center; gap: 20px; }
+        .stat-item {
+            background: #f1f8e9;
+            padding: 5px 15px;
+            border-radius: 25px;
+            border: 2px solid #7CB342;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .top-hud { 
-        background: var(--secondary); padding: 15px; display: flex; 
-        justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100;
-    }
+        /* القائمة الجانبية اليمنى (تعريب كامل) */
+        .side-panel {
+            width: 220px;
+            background: #e0f2f1;
+            padding: 15px;
+            border-left: 3px solid #b2dfdb;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .side-panel h3 { color: #00796b; text-align: center; border-bottom: 2px solid #80cbc4; padding-bottom: 10px; }
+        .player-item {
+            background: #ffffff;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            border-right: 5px solid #4db6ac;
+        }
 
-    .stat-item { background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid var(--accent); }
+        /* أرض المزرعة */
+        .farm-world {
+            flex-grow: 1;
+            position: relative;
+            background-color: #4CAF50;
+            background-image: radial-gradient(#81C784 10%, transparent 20%);
+            background-size: 50px 50px;
+        }
 
-    /* واجهة المخزن المتطور */
-    .inventory-window {
-        background: #fff; color: #333; margin: 10px auto; width: 90%; 
-        border-radius: 15px; padding: 10px; display: flex; justify-content: space-around;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-    }
-    .inv-slot { display: flex; flex-direction: column; align-items: center; font-weight: bold; }
-    .inv-slot span { font-size: 24px; }
+        .animal {
+            position: absolute;
+            width: 90px;
+            transition: all 3s ease-in-out;
+            cursor: pointer;
+            z-index: 10;
+        }
 
-    .farm-container {
-        background: var(--primary); padding: 20px; border-radius: 25px;
-        margin: 15px auto; width: max-content; border: 6px solid #1b5e20;
-    }
-    .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 12px; }
-    
-    .plot {
-        width: 90px; height: 90px; background: #795548; border-radius: 18px;
-        font-size: 38px; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; border: 3px solid #3e2723; transition: 0.3s;
-    }
-    .plot.selected { border-color: #fff; transform: scale(1.08); box-shadow: 0 0 20px #fff; }
+        /* أزرار التحكم */
+        .main-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px #e65100;
+            font-family: 'Cairo';
+        }
+        .main-btn:active { transform: translateY(2px); box-shadow: 0 2px #e65100; }
 
-    .controls {
-        background: rgba(0,0,0,0.9); padding: 15px; position: fixed; bottom: 0;
-        width: 100%; display: flex; flex-direction: column; gap: 10px; z-index: 200;
-    }
+        .collect-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 30px; /* في العربية نضعها يساراً لتقابل القائمة اليمنى */
+            background: #2196F3;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px #1976D2;
+        }
 
-    .btn {
-        padding: 12px 18px; border: none; border-radius: 12px; cursor: pointer;
-        font-family: Cairo; font-weight: bold; color: white; transition: 0.2s;
-    }
-    .btn-main { background: #43a047; box-shadow: 0 4px #2e7d32; }
-    .btn-harvest { background: #fb8c00; box-shadow: 0 4px #ef6c00; }
-    .btn-sell { background: #00bcd4; width: 90%; font-size: 16px; margin: 0 auto; }
-    
-    .level-badge {
-        background: var(--accent); color: #000; padding: 2px 8px;
-        border-radius: 20px; font-size: 12px; margin-right: 5px;
-    }
-</style>
+        /* المتجر */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 20px; text-align: center; width: 400px;
+        }
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .shop-card { border: 2px solid #eee; padding: 10px; border-radius: 15px; }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-<div class="quest-bar">
-    🎯 المهمة: <span id="quest-text">احصد 3 قمح</span> (<span id="quest-progress">0</span>/3)
-</div>
-
-<div class="top-hud">
-    <div class="stat-item">💰 <span id="money">0</span></div>
-    <div class="stat-item"><span class="level-badge">LVL <span id="lvl">1</span></span>⭐ <span id="xp">0</span></div>
-</div>
-
-<div class="inventory-window">
-    <div class="inv-slot"><span>🌾</span> <small id="inv-wheat">0</small></div>
-    <div class="inv-slot"><span>🍅</span> <small id="inv-tomato">0</small></div>
-    <div class="inv-slot"><span>🥖</span> <small id="prod-bread">0</small></div>
-    <div class="inv-slot"><span>🥫</span> <small id="prod-sauce">0</small></div>
-</div>
-
-<div class="farm-container">
-    <div class="grid" id="main-grid"></div>
-</div>
-
-<div class="controls">
-    <div style="display: flex; gap: 8px; justify-content: center;">
-        <button class="btn" style="background: #5d4037" onclick="craft('bread')">🥖 صنع خبز</button>
-        <button class="btn" style="background: #5d4037" onclick="craft('sauce')">🥫 صنع صلصة</button>
+<div id="login-screen" style="position:fixed; inset:0; background:#2E7D32; display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div style="background:white; padding:40px; border-radius:25px; text-align:center;">
+        <h2 style="color:#2E7D32;">مرحباً بك في مزرعتك العربية</h2>
+        <input type="text" id="username" placeholder="أدخل اسمك الكريم" style="padding:15px; width:250px; border-radius:10px; border:2px solid #ddd; font-family:'Cairo';"><br><br>
+        <button onclick="login()" class="main-btn" style="width:100%; font-size:20px;">دخول المزرعة</button>
     </div>
-    <div class="btn-row" style="display: flex; gap: 5px; justify-content: center;">
-        <button class="btn btn-main" onclick="plant('wheat')">🌾 قمح</button>
-        <button class="btn btn-main" style="background:#e53935" onclick="plant('tomato')">🍅 طماطم</button>
-        <button class="btn btn-harvest" onclick="harvest()">🧺 حصاد</button>
-        <button class="btn" style="background:#9e9e9e" onclick="buyLand()">🛒 +أرض</button>
-    </div>
-    <button onclick="sellAll()" class="btn btn-sell">💰 بيع كل المنتجات المصنعة</button>
 </div>
 
-<audio id="sound-plant" src="https://www.soundjay.com/buttons/sounds/button-37.mp3"></audio>
-<audio id="sound-harvest" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+<div id="game-ui" class="hidden">
+    <div class="top-bar">
+        <div class="section">
+            <div class="stat-item">💰 ذهب: <span id="gold-val">0</span></div>
+            <div class="stat-item">🥚 بيض: <span id="egg-val">0</span></div>
+            <div class="stat-item">🍯 عسل: <span id="honey-val">0</span></div>
+        </div>
+        <div class="section">
+            <div class="stat-item">⭐ مستوى: <span id="lvl-val">1</span></div>
+            <button onclick="location.reload()" style="background:#f44336; color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">X</button>
+        </div>
+    </div>
+
+    <div style="display:flex; flex-grow:1;">
+        <div class="side-panel">
+            <h3>قائمة المزرعة</h3>
+            <div class="player-item">نظام المزرعة <span style="color:#4caf50;">متصل</span></div>
+            <div class="player-item">أحمد (جار) <span>🏠</span></div>
+            <div class="player-item">سارة (جارة) <span>🐝</span></div>
+            <div class="player-item">علي (جار) <span>🐄</span></div>
+            <hr>
+            <button class="main-btn" style="width:100%;" onclick="showShop()">🛒 المتجر</button>
+        </div>
+
+        <div class="farm-world" id="farm-area">
+            <button class="collect-btn" onclick="collectAll()">إيعان (جمع)</button>
+        </div>
+    </div>
+</div>
+
+<div id="shop-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3>🛒 متجر المزرعة</h3>
+        <div class="shop-grid">
+            <div class="shop-card">
+                <img src="https://i.ibb.co/4pMym7Q/chicken-walk.gif" width="60"><br>
+                <b>دجاجة بياضة</b><br>200💰<br>
+                <button onclick="buy('chicken', 200)" style="margin-top:5px;">شراء</button>
+            </div>
+            <div class="shop-card">
+                <img src="https://i.ibb.co/r76k84M/cow-walk.gif" width="70"><br>
+                <b>بقرة حلوب</b><br>500💰<br>
+                <button onclick="buy('cow', 500)" style="margin-top:5px;">شراء</button>
+            </div>
+        </div>
+        <button class="main-btn" onclick="document.getElementById('shop-modal').classList.add('hidden')">إغلاق</button>
+    </div>
+</div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("farmProData")) || {
-    money: 150,
-    land: 6,
-    plots: Array(6).fill({type: "", stage: ""}),
-    inv: { wheat: 0, tomato: 0 },
-    prods: { bread: 0, sauce: 0 },
-    xp: 0, lvl: 1,
-    quest: { target: 3, current: 0, type: 'wheat', reward: 100 }
-};
+    let farm = { user: "", gold: 1000, eggs: 0, honey: 0, animals: [] };
 
-let selected = null;
+    const IMAGES = {
+        chicken: 'https://i.ibb.co/4pMym7Q/chicken-walk.gif',
+        cow: 'https://i.ibb.co/r76k84M/cow-walk.gif'
+    };
 
-function save() { localStorage.setItem("farmProData", JSON.stringify(data)); }
-
-function playSound(id) {
-    const s = document.getElementById(id);
-    s.currentTime = 0;
-    s.play().catch(()=>{}); // لتجنب أخطاء المتصفح إذا لم يتفاعل المستخدم
-}
-
-function draw() {
-    document.getElementById("money").innerText = data.money;
-    document.getElementById("inv-wheat").innerText = data.inv.wheat;
-    document.getElementById("inv-tomato").innerText = data.inv.tomato;
-    document.getElementById("prod-bread").innerText = data.prods.bread;
-    document.getElementById("prod-sauce").innerText = data.prods.sauce;
-    document.getElementById("xp").innerText = data.xp;
-    document.getElementById("lvl").innerText = data.lvl;
-    
-    // تحديث واجهة المهام
-    document.getElementById("quest-text").innerText = `احصد ${data.quest.target} ${data.quest.type === 'wheat' ? 'قمح' : 'طماطم'}`;
-    document.getElementById("quest-progress").innerText = data.quest.current;
-
-    const grid = document.getElementById("main-grid");
-    grid.innerHTML = "";
-    grid.style.gridTemplateColumns = `repeat(${data.land > 9 ? 4 : 3}, 90px)`;
-
-    for(let i=0; i<data.land; i++) {
-        let p = data.plots[i];
-        let d = document.createElement("div");
-        d.className = "plot" + (selected === i ? " selected" : "");
-        if(p.stage === "growing") d.innerText = "🌱";
-        else if(p.stage === "ready") d.innerText = p.type === "wheat" ? "🌾" : "🍅";
-        d.onclick = () => { selected = i; draw(); };
-        grid.appendChild(d);
-    }
-    save();
-}
-
-function plant(type) {
-    if(selected === null || data.plots[selected].stage !== "") return;
-    let cost = type === 'wheat' ? 5 : 15;
-    if(data.money >= cost) {
-        data.money -= cost;
-        data.plots[selected] = { type: type, stage: "growing" };
-        playSound("sound-plant");
-        draw();
-        let p = selected;
-        setTimeout(() => {
-            if(data.plots[p].stage === "growing") {
-                data.plots[p].stage = "ready";
-                draw();
-            }
-        }, type === 'wheat' ? 3000 : 7000);
-    }
-}
-
-function harvest() {
-    if(selected !== null && data.plots[selected].stage === "ready") {
-        let type = data.plots[selected].type;
-        data.inv[type]++;
-        data.xp += 10;
+    function login() {
+        let u = document.getElementById('username').value.trim();
+        if(!u) return alert("من فضلك اكتب اسمك أولاً");
+        let saved = localStorage.getItem('farm_arabic_v14_' + u);
+        if(saved) farm = JSON.parse(saved); else farm.user = u;
         
-        // تحديث المهمة
-        if(data.quest.type === type) {
-            data.quest.current++;
-            if(data.quest.current >= data.quest.target) {
-                data.money += data.quest.reward;
-                alert(`✨ أحسنت! أكملت المهمة وربحت ${data.quest.reward}💰`);
-                data.quest.current = 0;
-                data.quest.target += 2;
-                data.quest.type = Math.random() > 0.5 ? 'wheat' : 'tomato';
-            }
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('game-ui').classList.remove('hidden');
+        
+        farm.animals.forEach((a, i) => renderAnimal(a, i));
+        updateUI();
+        setInterval(moveAnimals, 4000);
+        setInterval(() => {
+            farm.animals.forEach(a => { if(a === 'chicken') farm.eggs++; });
+            updateUI();
+        }, 8000);
+    }
+
+    function renderAnimal(type, id) {
+        let img = document.createElement('img');
+        img.src = IMAGES[type];
+        img.className = 'animal';
+        img.id = 'anim-' + id;
+        img.style.left = Math.random() * 70 + "%";
+        img.style.top = Math.random() * 70 + "%";
+        document.getElementById('farm-area').appendChild(img);
+    }
+
+    function moveAnimals() {
+        let animals = document.getElementsByClassName('animal');
+        for(let a of animals) {
+            a.style.left = Math.random() * 70 + 10 + "%";
+            a.style.top = Math.random() * 70 + 10 + "%";
         }
-
-        // ليفل أب
-        if(data.xp >= data.lvl * 100) {
-            data.lvl++;
-            alert("🎊 مبروك! وصلت لمستوى " + data.lvl);
-        }
-
-        data.plots[selected] = {type: "", stage: ""};
-        playSound("sound-harvest");
-        draw();
     }
-}
 
-function craft(prod) {
-    if(prod === 'bread' && data.inv.wheat >= 3) {
-        data.inv.wheat -= 3; data.prods.bread++;
-    } else if(prod === 'sauce' && data.inv.tomato >= 2) {
-        data.inv.tomato -= 2; data.prods.sauce++;
-    } else {
-        alert("الموارد غير كافية!");
+    function buy(type, price) {
+        if(farm.gold >= price) {
+            farm.gold -= price;
+            farm.animals.push(type);
+            renderAnimal(type, Date.now());
+            updateUI();
+            alert("تم الشراء بنجاح! مبروك عليك.");
+        } else { alert("عذراً، الذهب لا يكفي."); }
     }
-    draw();
-}
 
-function sellAll() {
-    let total = (data.prods.bread * 150) + (data.prods.sauce * 200);
-    data.money += total;
-    data.prods = { bread: 0, sauce: 0 };
-    draw();
-}
-
-function buyLand() {
-    if(data.money >= 50) {
-        data.money -= 50; data.land++;
-        data.plots.push({type: "", stage: ""});
-        draw();
+    function collectAll() {
+        if(farm.eggs > 0) {
+            let gain = farm.eggs * 20;
+            farm.gold += gain;
+            farm.eggs = 0;
+            alert("تم جمع البيض وربحت " + gain + " ذهبة!");
+            updateUI();
+        } else { alert("لا يوجد بيض لجمعه الآن."); }
     }
-}
 
-draw();
+    function showShop() { document.getElementById('shop-modal').classList.remove('hidden'); }
+
+    function updateUI() {
+        document.getElementById('gold-val').innerText = farm.gold;
+        document.getElementById('egg-val').innerText = farm.eggs;
+        document.getElementById('honey-val').innerText = farm.honey;
+        document.getElementById('lvl-val').innerText = Math.floor(farm.gold / 2000) + 1;
+        localStorage.setItem('farm_arabic_v14_' + farm.user, JSON.stringify(farm));
+    }
 </script>
 </body>
-    </html>
+                                                          </html>
