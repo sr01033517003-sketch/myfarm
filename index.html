@@ -1,19 +1,66 @@
-<script>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مزرعة الأساطير - الإصدار الذهبي</title>
+    <style>
+        :root { --gold: #ffd700; --energy: #00bcd4; }
+        body { background: #1b5e20; font-family: 'Segoe UI', sans-serif; margin: 0; color: white; text-align: center; }
+        
+        .header { background: #2e7d32; padding: 10px; display: flex; justify-content: space-around; border-bottom: 4px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        .stat { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 15px; border: 1px solid var(--gold); font-weight: bold; font-size: 18px; }
+        
+        .energy-bar-container { width: 250px; height: 18px; background: #eee; border-radius: 10px; margin: 15px auto; border: 2px solid #fff; overflow: hidden; }
+        #energy-fill { width: 100%; height: 100%; background: var(--energy); transition: 0.5s; }
+
+        .farm-world { display: grid; grid-template-columns: repeat(4, 75px); gap: 10px; justify-content: center; padding: 20px; background: #4caf50; border: 8px solid #3e2723; border-radius: 20px; margin: 10px auto; width: fit-content; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .plot { width: 75px; height: 75px; background: #5d4037; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; border: 2px solid #3d1c02; }
+
+        .btn { background: #e67e22; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin: 10px; font-size: 16px; box-shadow: 0 4px #d35400; }
+        .btn:active { box-shadow: none; transform: translateY(4px); }
+        
+        #login-screen { background: radial-gradient(#2e7d32, #1b5e20); position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h1 style="color:var(--gold); text-shadow: 2px 2px #000;">🚜 مزرعة الأساطير V5 🌾</h1>
+        <p>اكتب اسمك لاستعادة مزرعتك:</p>
+        <input type="text" id="username" placeholder="اسمك هنا..." style="padding:15px; border-radius:10px; border:none; width:250px; text-align:center; font-size:18px;">
+        <br>
+        <button onclick="login()" style="padding:15px 60px; background:var(--gold); color:#333; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:20px;">دخول المزرعة</button>
+    </div>
+
+    <div id="game" class="hidden">
+        <div class="header">
+            <div class="stat">💰 <span id="gold">0</span></div>
+            <div class="stat">⭐ مستوى: <span id="lvl-display">1</span></div>
+            <div class="stat">📦 <span id="inv">0</span></div>
+        </div>
+
+        <div class="energy-bar-container"><div id="energy-fill"></div></div>
+        <p>⚡ الطاقة: <span id="energy-text">100</span>%</p>
+
+        <div class="farm-world" id="grid"></div>
+
+        <div style="background:rgba(255,255,255,0.1); padding:10px; margin:10px; border-radius:15px;">
+            <button class="btn" onclick="sellEverything()" style="background:#2ecc71">بيع كل المحاصيل 💰</button>
+            <button class="btn" onclick="buyEnergy()" style="background:#3498db">شحن طاقة (50 ذهب)</button>
+        </div>
+    </div>
+
+    <script>
         let data = { user: "", gold: 1000, inv: 0, energy: 100, lvl: 1 };
 
         function login() {
             let u = document.getElementById('username').value.trim();
             if(!u) return alert("من فضلك اكتب اسمك");
             
-            let saved = localStorage.getItem('pro_farm_' + u) || 
-                        localStorage.getItem('happy_farm_' + u) || 
-                        localStorage.getItem('farm_' + u);
-            
-            if(saved) {
-                data = JSON.parse(saved);
-            } else {
-                data.user = u;
-            }
+            let saved = localStorage.getItem('pro_farm_' + u) || localStorage.getItem('happy_farm_' + u);
+            if(saved) data = JSON.parse(saved);
+            else data.user = u;
             
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('game').classList.remove('hidden');
@@ -24,7 +71,7 @@
 
         function initGrid() {
             const grid = document.getElementById('grid');
-            grid.innerHTML = ""; // لتنظيف الأرض عند الدخول
+            grid.innerHTML = "";
             for(let i=0; i<16; i++) {
                 let p = document.createElement('div');
                 p.className = 'plot';
@@ -39,16 +86,19 @@
                 p.innerHTML = "🌱";
                 update();
                 setTimeout(() => {
-                    p.innerHTML = (data.lvl >= 3) ? "🍓" : "🌾"; 
+                    // شكل الزرع يتغير حسب المستوى
+                    if (data.lvl >= 4) p.innerHTML = "🍓";
+                    else if (data.lvl >= 2) p.innerHTML = "🍅";
+                    else p.innerHTML = "🌾";
+                    
                     p.onclick = () => {
                         data.inv++;
                         p.innerHTML = "";
                         p.onclick = () => work(p);
-                        checkLevel(); // فحص المستوى عند كل حصاد
                         update();
                     };
                 }, 3000);
-            } else if(data.energy < 10) { alert("طاقتك نفذت! ارتاح أو اشترِ طاقة."); }
+            } else if(data.energy < 10) { alert("طاقتك نفذت! اشحن طاقتك لتكمل العمل."); }
         }
 
         function checkLevel() {
@@ -58,25 +108,24 @@
             else if (data.gold >= 2000) data.lvl = 2;
             
             if (data.lvl > oldLvl) {
-                alert("🎊 مبروك! ارتفع مستواك إلى المستوى " + data.lvl);
+                alert("🎊 مبروك يا بطل! ارتفع مستواك إلى المستوى " + data.lvl);
             }
         }
 
         function sellEverything() {
             if(data.inv > 0) {
-                let price = (data.lvl >= 3) ? 300 : 150; // المحصول أغلى في المستويات العالية
+                let price = 100 + (data.lvl * 50); // السعر يزيد بزيادة المستوى
                 data.gold += data.inv * price;
                 data.inv = 0;
-                checkLevel(); // فحص المستوى بعد البيع
+                checkLevel();
                 update();
-                alert("تم بيع المحصول بنجاح!");
             }
         }
 
         function buyEnergy() {
             if(data.gold >= 50) {
                 data.gold -= 50;
-                data.energy = Math.min(data.energy + 30, 100);
+                data.energy = Math.min(data.energy + 40, 100);
                 update();
             }
         }
@@ -90,13 +139,12 @@
 
         function update() {
             document.getElementById('gold').innerText = data.gold;
+            document.getElementById('lvl-display').innerText = data.lvl; // تحديث الرقم في الشاشة
             document.getElementById('energy-text').innerText = data.energy;
             document.getElementById('energy-fill').style.width = data.energy + "%";
             document.getElementById('inv').innerText = data.inv;
-            // تحديث المستوى في الواجهة
-            if(document.getElementById('lvl-display')) {
-                document.getElementById('lvl-display').innerText = data.lvl;
-            }
             localStorage.setItem('pro_farm_' + data.user, JSON.stringify(data));
         }
-                </script>
+    </script>
+</body>
+</html>
