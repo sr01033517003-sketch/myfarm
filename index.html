@@ -2,300 +2,187 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مزرعة الأساطير: التوسعة الكبرى</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزرعة الأساطير - النسخة الموسعة</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
         
-        :root {
-            --primary: #2e7d32;
-            --accent: #ff9800;
-            --bg-ui: rgba(255, 255, 255, 0.9);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         
         body { 
-            background: #1b5e20; 
+            background: #2e7d32; 
             height: 100vh; 
             overflow: hidden; 
             display: flex; 
-            flex-direction: column; 
+            flex-direction: column;
+            color: white;
         }
 
-        /* واجهة المستخدم العلوية (HUD) */
-        .hud-top {
-            position: fixed; top: 10px; left: 0; right: 0;
-            display: flex; justify-content: center; gap: 15px; z-index: 100;
-            pointer-events: none;
+        /* العدادات العلوية - شفافة وأنيقة */
+        .header {
+            height: 60px;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
         }
-        .stat-card {
-            background: var(--bg-ui); padding: 8px 20px; border-radius: 50px;
-            border: 3px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 10px; pointer-events: auto;
-            font-weight: 900; color: var(--primary);
+        .stat-item { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #ffd700; font-size: 14px; }
+
+        /* منطقة اللعب الرئيسية - واسعة جداً */
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: auto; /* يسمح بالتنقل في المزرعة */
+            padding: 40px;
+            background: radial-gradient(#4caf50, #1b5e20);
         }
 
-        /* عالم المزرعة (منطقة التنقل) */
-        #viewport {
-            flex: 1; overflow: auto; cursor: grab;
-            background-image: radial-gradient(#4caf50 10%, #388e3c 90%);
-            display: flex; align-items: center; justify-content: center;
-        }
-        #world {
-            display: grid; grid-template-columns: repeat(6, 150px);
-            gap: 20px; padding: 500px; /* مساحة واسعة للتنقل */
-            transition: transform 0.1s;
-        }
-
-        /* قطعة الأرض */
-        .plot-land {
-            width: 150px; height: 150px; border-radius: 20px;
-            position: relative; display: flex; align-items: center; justify-content: center;
-            font-size: 50px; transition: 0.3s;
-        }
-        .land-unlocked { background: #5d4037; border: 5px solid #3e2723; cursor: pointer; }
-        .land-locked { 
-            background: rgba(0,0,0,0.4); border: 3px dashed #fff; 
-            font-size: 20px; color: #fff; cursor: pointer; text-align: center;
-        }
-        .land-locked:hover { background: rgba(0,0,0,0.6); }
-
-        /* القائمة الجانبية الاحترافية */
-        .side-menu {
-            position: fixed; right: 15px; top: 100px; bottom: 100px;
-            width: 280px; background: var(--bg-ui); border-radius: 25px;
-            border: 4px solid var(--primary); padding: 15px; display: flex;
-            flex-direction: column; gap: 15px; z-index: 200;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+        /* شبكة المزرعة المنظمة */
+        .farm-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 120px); /* 6 أعمدة */
+            gap: 15px;
+            margin: auto; /* تتوسط الشاشة */
+            padding: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 30px;
+            border: 5px solid #3e2723;
         }
 
-        .btn-action {
-            background: var(--accent); color: white; border: none;
-            padding: 12px; border-radius: 15px; font-weight: bold;
-            cursor: pointer; box-shadow: 0 5px #e65100; width: 100%;
+        .plot {
+            width: 120px; height: 120px; background: #5d4037;
+            border-radius: 15px; border: 3px solid #3e2723;
+            cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; font-size: 45px; position: relative;
+            transition: 0.2s;
         }
-        .btn-action:active { transform: translateY(3px); box-shadow: 0 2px #e65100; }
+        .plot:hover { transform: scale(1.05); background: #6d4c41; }
 
-        /* شريط الخبرة */
-        .xp-container { width: 100%; height: 12px; background: #ddd; border-radius: 6px; overflow: hidden; }
-        .xp-bar { width: 30%; height: 100%; background: #2196f3; transition: 0.5s; }
-
-        /* الدردشة المصغرة */
-        .mini-chat {
-            flex: 1; background: #f1f8e9; border-radius: 15px; padding: 10px;
-            font-size: 12px; overflow-y: auto; border: 1px solid #cddc39;
+        /* المتجر الجانبي - صغير ومنظم */
+        .side-shop {
+            position: fixed; left: 10px; top: 100px;
+            width: 180px; background: rgba(0,0,0,0.6);
+            padding: 15px; border-radius: 20px; border: 2px solid #fff;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .shop-btn {
+            background: #ff9800; border: none; padding: 10px;
+            color: white; border-radius: 10px; font-weight: bold;
+            cursor: pointer; font-size: 12px; box-shadow: 0 3px #e65100;
         }
 
-        /* تأثيرات النضج */
-        .ready-icon {
-            position: absolute; top: -15px; animation: bounce 1s infinite;
-            background: #ffeb3b; padding: 2px 8px; border-radius: 10px; font-size: 14px;
+        /* خانة المحادثة - صغيرة ومن الأسفل */
+        .bottom-chat {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 400px; background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px 15px 0 0; padding: 10px;
+            display: flex; flex-direction: column; gap: 5px;
+            border: 1px solid #fff; z-index: 500;
         }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .chat-display { height: 60px; overflow-y: auto; font-size: 12px; border-bottom: 1px solid #555; margin-bottom: 5px; }
+        .chat-input-row { display: flex; gap: 5px; }
+        .chat-input-row input { flex: 1; padding: 5px; border-radius: 5px; border: none; font-size: 12px; }
 
-        .hidden { display: none !important; }
+        .ready-text { position: absolute; bottom: 5px; font-size: 10px; background: yellow; color: black; padding: 2px 5px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="hud-top">
-        <div class="stat-card">💰 <span id="gold">1000</span></div>
-        <div class="stat-card">
-            <div style="text-align:center">
-                <span id="lvl-text">المستوى 1</span>
-                <div class="xp-container"><div class="xp-bar" id="xp-bar"></div></div>
-            </div>
-        </div>
-        <div class="stat-card">🌱 <span id="seeds">10</span></div>
+    <div class="header">
+        <div class="stat-item">💰 ذهب: <span id="gold">1000</span></div>
+        <div class="stat-item">⭐ مستوى: <span id="lvl">1</span></div>
+        <div class="stat-item">🌱 بذور: <span id="seeds">10</span></div>
+        <div class="stat-item">🌾 حصاد: <span id="crops">0</span></div>
     </div>
 
-    <div id="viewport">
-        <div id="world">
+    <div class="side-shop">
+        <h4 style="text-align:center; font-size:14px;">🛒 المتجر</h4>
+        <button class="shop-btn" onclick="buy('seeds', 50)">بذور (50💰)</button>
+        <button class="shop-btn" onclick="buy('animal', 300)">دجاجة (300💰)</button>
+        <button class="shop-btn" style="background:#2196f3; box-shadow: 0 3px #1565c0;" onclick="sell()">بيع الكل</button>
+    </div>
+
+    <div class="main-content">
+        <div class="farm-grid" id="grid">
             </div>
     </div>
 
-    <div class="side-menu">
-        <h3 style="text-align:center; color: var(--primary)">🚜 لوحة التحكم</h3>
-        
-        <div class="inventory">
-            <p style="font-size:14px">📦 المخزن:</p>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px">
-                <div style="background:#fff; padding:5px; border-radius:8px">🌾 محاصيل: <b id="inv-crops">0</b></div>
-                <div style="background:#fff; padding:5px; border-radius:8px">🍯 عسل: <b id="inv-honey">0</b></div>
-            </div>
+    <div class="bottom-chat">
+        <div class="chat-display" id="chat">
+            <div><b>النظام:</b> أهلاً بك! المحادثة الآن صغيرة لتستمتع بالزراعة.</div>
         </div>
-
-        <button class="btn-action" onclick="buySeeds()">🛒 شراء بذور (50💰)</button>
-        <button class="btn-action" style="background:#2196f3; box-shadow: 0 5px #1976d2;" onclick="sellCrops()">💰 بيع المحصول</button>
-        
-        <hr>
-        <div class="mini-chat" id="chat-box">
-            <div><b>النظام:</b> مرحباً بك في توسعة المزرعة! اسحب الشاشة للتنقل.</div>
-        </div>
-        <div style="display:flex; gap:5px">
-            <input type="text" id="chat-input" placeholder="دردشة..." style="flex:1; padding:5px; border-radius:5px; border:1px solid #ccc">
-            <button onclick="sendMsg()" style="padding:5px; background:var(--primary); color:white; border:none; border-radius:5px">↩</button>
+        <div class="chat-input-row">
+            <input type="text" id="chat-in" placeholder="اكتب رسالة...">
+            <button onclick="sendMsg()" style="background:#4caf50; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">إرسال</button>
         </div>
     </div>
 
     <script>
-        // البيانات والحفظ التلقائي
-        let state = JSON.parse(localStorage.getItem('farmData')) || {
-            gold: 1000, xp: 0, lvl: 1, seeds: 10, crops: 0, honey: 0,
-            unlockedLands: [0, 1, 2, 3] // الأراضي المفتوحة افتراضياً
-        };
+        let farm = { gold: 1000, seeds: 10, crops: 0, lvl: 1 };
 
-        const world = document.getElementById('world');
-        const totalLands = 24; // إجمالي مساحة الخريطة
+        // إنشاء المزرعة (24 قطعة)
+        const grid = document.getElementById('grid');
+        for(let i=0; i<24; i++) {
+            let p = document.createElement('div');
+            p.className = 'plot';
+            p.onclick = () => handlePlot(p);
+            grid.appendChild(p);
+        }
 
-        function save() {
-            localStorage.setItem('farmData', JSON.stringify(state));
+        function handlePlot(p) {
+            if(p.innerHTML === "" && farm.seeds > 0) {
+                farm.seeds--;
+                p.innerHTML = "🌱";
+                updateUI();
+                setTimeout(() => {
+                    p.innerHTML = "🌾<div class='ready-text'>ناضج!</div>";
+                }, 5000); // نضج سريع للتجربة
+            } else if(p.innerText.includes("🌾")) {
+                p.innerHTML = "";
+                farm.crops++;
+                updateUI();
+            }
+        }
+
+        function buy(type, price) {
+            if(farm.gold >= price) {
+                farm.gold -= price;
+                if(type === 'seeds') farm.seeds += 5;
+                updateUI();
+                addChat("النظام", `تم الشراء بنجاح!`);
+            }
+        }
+
+        function sell() {
+            let gain = farm.crops * 100;
+            farm.gold += gain;
+            farm.crops = 0;
             updateUI();
-        }
-
-        // بناء المزرعة
-        function buildWorld() {
-            world.innerHTML = '';
-            for(let i=0; i < totalLands; i++) {
-                let land = document.createElement('div');
-                if(state.unlockedLands.includes(i)) {
-                    land.className = 'plot-land land-unlocked';
-                    land.onclick = () => handleLandClick(land, i);
-                } else {
-                    land.className = 'plot-land land-locked';
-                    land.innerHTML = `🔒<br><small>${(state.unlockedLands.length * 500)}💰</small>`;
-                    land.onclick = () => unlockLand(i);
-                }
-                world.appendChild(land);
-            }
-        }
-
-        function handleLandClick(land, id) {
-            if(land.dataset.status === 'growing') return;
-            
-            if(land.dataset.status === 'ready') {
-                harvest(land);
-            } else if(state.seeds > 0) {
-                plant(land);
-            } else {
-                addChat("النظام", "لا تملك بذوراً!");
-            }
-        }
-
-        function plant(land) {
-            state.seeds--;
-            land.dataset.status = 'growing';
-            land.innerHTML = '🌱';
-            save();
-
-            let growTime = 5; // 5 ثواني للتجربة
-            let timer = setInterval(() => {
-                growTime--;
-                if(growTime <= 0) {
-                    clearInterval(timer);
-                    land.dataset.status = 'ready';
-                    land.innerHTML = '🌾 <div class="ready-icon">ناضج!</div>';
-                }
-            }, 1000);
-        }
-
-        function harvest(land) {
-            state.crops++;
-            state.xp += 25;
-            land.dataset.status = 'empty';
-            land.innerHTML = '';
-            checkLevel();
-            save();
-            addChat("المزرعة", "تم الحصاد! +25 خبرة");
-        }
-
-        function unlockLand(id) {
-            let cost = state.unlockedLands.length * 500;
-            if(state.gold >= cost) {
-                state.gold -= cost;
-                state.unlockedLands.push(id);
-                buildWorld();
-                save();
-                addChat("النظام", "تم توسعة المزرعة بنجاح! 🚜");
-            } else {
-                alert("تحتاج إلى المزيد من الذهب للتوسعة!");
-            }
-        }
-
-        function checkLevel() {
-            let nextLevelAt = state.lvl * 200;
-            if(state.xp >= nextLevelAt) {
-                state.lvl++;
-                state.xp = 0;
-                state.gold += 500;
-                addChat("النظام", `مبروك! ارتفعت للمستوى ${state.lvl} وحصلت على مكافأة 💰`);
-            }
-        }
-
-        function buySeeds() {
-            if(state.gold >= 50) {
-                state.gold -= 50;
-                state.seeds += 5;
-                save();
-            }
-        }
-
-        function sellCrops() {
-            if(state.crops > 0) {
-                let gain = state.crops * 80;
-                state.gold += gain;
-                state.crops = 0;
-                save();
-                addChat("أنت", `بعت المحصول مقابل ${gain} 💰`);
-            }
+            addChat("المتجر", `بعت المحصول بـ ${gain}💰`);
         }
 
         function updateUI() {
-            document.getElementById('gold').innerText = state.gold;
-            document.getElementById('seeds').innerText = state.seeds;
-            document.getElementById('inv-crops').innerText = state.crops;
-            document.getElementById('lvl-text').innerText = `المستوى ${state.lvl}`;
-            let nextXp = state.lvl * 200;
-            document.getElementById('xp-bar').style.width = (state.xp / nextXp * 100) + "%";
-        }
-
-        function addChat(user, msg) {
-            const box = document.getElementById('chat-box');
-            box.innerHTML += `<div><b>${user}:</b> ${msg}</div>`;
-            box.scrollTop = box.scrollHeight;
+            document.getElementById('gold').innerText = farm.gold;
+            document.getElementById('seeds').innerText = farm.seeds;
+            document.getElementById('crops').innerText = farm.crops;
         }
 
         function sendMsg() {
-            let inp = document.getElementById('chat-input');
-            if(inp.value) { addChat("أنت", inp.value); inp.value = ''; }
+            let input = document.getElementById('chat-in');
+            if(input.value) {
+                addChat("أنت", input.value);
+                input.value = "";
+            }
         }
 
-        // التنقل بالسحب (للكمبيوتر والموبايل)
-        const viewport = document.getElementById('viewport');
-        let isDown = false; let startX, scrollLeft, startY, scrollTop;
-
-        viewport.addEventListener('mousedown', (e) => {
-            isDown = true; viewport.style.cursor = 'grabbing';
-            startX = e.pageX - viewport.offsetLeft; startY = e.pageY - viewport.offsetTop;
-            scrollLeft = viewport.scrollLeft; scrollTop = viewport.scrollTop;
-        });
-        viewport.addEventListener('mouseleave', () => isDown = false);
-        viewport.addEventListener('mouseup', () => { isDown = false; viewport.style.cursor = 'grab'; });
-        viewport.addEventListener('mousemove', (e) => {
-            if(!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - viewport.offsetLeft; const y = e.pageY - viewport.offsetTop;
-            const walkX = (x - startX) * 2; const walkY = (y - startY) * 2;
-            viewport.scrollLeft = scrollLeft - walkX; viewport.scrollTop = scrollTop - walkY;
-        });
-
-        // تشغيل البداية
-        buildWorld();
-        updateUI();
-        // تمركز الكاميرا في البداية
-        viewport.scrollLeft = 400; viewport.scrollTop = 400;
-
+        function addChat(user, txt) {
+            let c = document.getElementById('chat');
+            c.innerHTML += `<div><b>${user}:</b> ${txt}</div>`;
+            c.scrollTop = c.scrollHeight;
+        }
     </script>
 </body>
-    </html>
+                </html>
