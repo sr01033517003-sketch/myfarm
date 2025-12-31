@@ -2,209 +2,160 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مزرعة الأساطير النهائية - زراعة وحصاد</title>
+    <title>مزرعة الأساطير الواقعية V15</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap');
-        body { background: #4CAF50; font-family: 'Cairo', sans-serif; margin: 0; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap');
+        body { background: #4CAF50; font-family: 'Cairo', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
         
-        /* شريط العدادات العلوي */
-        .header { background: #8BC34A; padding: 10px; display: flex; justify-content: space-around; border-bottom: 4px solid #689F38; z-index: 100; }
-        .stat { background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; border: 1px solid #ffd700; font-weight: bold; font-size: 14px; }
+        /* شريط الأدوات العلوي المطابق لطلبك */
+        .top-bar { background: #8BC34A; padding: 15px; display: flex; justify-content: space-around; border-bottom: 5px solid #689F38; }
+        .stat { background: #f1f8e9; padding: 5px 20px; border-radius: 20px; border: 2px solid #7CB342; font-weight: bold; display: flex; align-items: center; gap: 10px; }
 
-        .main-game { display: flex; flex: 1; }
+        .game-body { display: flex; flex: 1; position: relative; }
 
-        /* القائمة الجانبية الزرقاء مثل الصورة */
-        .side-menu { width: 200px; background: #B2DFDB; color: #004D40; padding: 15px; border-left: 3px solid #80CBC4; display: flex; flex-direction: column; gap: 10px; }
-        .side-menu h3 { text-align: center; margin-top: 0; border-bottom: 2px solid #80CBC4; }
-        .player-tag { background: #e0f2f1; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; }
+        /* القائمة الجانبية الزرقاء */
+        .side-menu { width: 220px; background: #B2DFDB; padding: 15px; border-left: 4px solid #80CBC4; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+        .player-card { background: #ffffff; padding: 10px; border-radius: 12px; font-size: 14px; text-align: center; border-right: 5px solid #4db6ac; }
 
         /* ساحة المزرعة */
-        .farm-area { flex: 1; position: relative; padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+        .farm-world { flex: 1; position: relative; background: #4CAF50; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+
+        /* مربعات الزراعة (3 دقائق) */
+        .grid { display: grid; grid-template-columns: repeat(4, 85px); gap: 12px; background: #5d4037; padding: 20px; border-radius: 25px; border: 8px solid #3e2723; }
+        .plot { width: 85px; height: 85px; background: #6d4c41; border: 2px solid #3d1c02; border-radius: 12px; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .timer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #00ff00; font-size: 12px; text-align: center; border-radius: 0 0 10px 10px; }
+
+        /* الدجاجة الواقعية (صورتك) */
+        .chicken { position: absolute; width: 110px; transition: all 4s ease-in-out; cursor: pointer; z-index: 5; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3)); }
+
+        /* أزرار التحكم */
+        .btn-collect { position: absolute; bottom: 30px; left: 30px; background: #2196F3; color: white; padding: 15px 45px; border-radius: 50px; font-size: 22px; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 6px #1976D2; }
+        .btn-collect:active { transform: translateY(3px); box-shadow: 0 2px #1976D2; }
         
-        /* شبكة الزراعة (البرسيم والمحاصيل) */
-        .crop-grid { display: grid; grid-template-columns: repeat(4, 80px); gap: 10px; background: #5d4037; padding: 15px; border-radius: 20px; border: 8px solid #3e2723; }
-        .plot { width: 80px; height: 80px; background: #6d4c41; border: 2px solid #3d1c02; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .timer { position: absolute; bottom: 2px; font-size: 11px; color: #ffd700; background: rgba(0,0,0,0.5); padding: 0 4px; border-radius: 4px; }
+        .btn-buy { background: #4CAF50; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-family: 'Cairo'; }
 
-        /* منطقة الحيوانات المتحركة */
-        .animal-pen { width: 100%; height: 250px; position: relative; margin-top: 20px; background: rgba(255,255,255,0.1); border-radius: 30px; border: 2px dashed #fff; overflow: hidden; }
-        .moving-animal { position: absolute; width: 80px; transition: all 3s linear; cursor: pointer; }
-
-        /* أزرار المتجر والبيع */
-        .footer-btns { position: fixed; bottom: 20px; left: 220px; display: flex; gap: 15px; }
-        .btn { padding: 12px 25px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; color: white; box-shadow: 0 4px #000; }
-        .btn-sell { background: #2196F3; } /* زر إيعان/جمع */
-        .btn-buy { background: #FF9800; }
-
-        /* شاشة الدخول */
-        .overlay { position: fixed; inset: 0; background: #2e7d32; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .login-box { background: white; padding: 40px; border-radius: 25px; text-align: center; color: #333; }
-        
+        #login { position: fixed; inset: 0; background: #2E7D32; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-card { background: white; padding: 40px; border-radius: 30px; text-align: center; width: 300px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="overlay">
-        <div class="login-box">
-            <h2>🚜 مزرعة الأساطير العربية</h2>
-            <input type="text" id="username" placeholder="أدخل اسمك الكريم" style="padding:15px; border-radius:10px; border:1px solid #ccc; width:220px; font-family:'Cairo';"><br><br>
-            <button onclick="start()" class="btn" style="background:#4CAF50; width:100%;">دخول المزرعة</button>
-        </div>
+<div id="login">
+    <div class="login-card">
+        <h2 style="color:#2E7D32">🚜 المزرعة الحقيقية</h2>
+        <input type="text" id="user" placeholder="أدخل اسمك" style="padding:12px; width:80%; border-radius:10px; border:1px solid #ccc; font-family:'Cairo';"><br><br>
+        <button onclick="start()" class="btn-buy" style="background:#FF9800; font-size:18px;">دخول الآن</button>
+    </div>
+</div>
+
+<div id="game" class="hidden" style="display:contents;">
+    <div class="top-bar">
+        <div class="stat">💰 ذهب: <span id="gold">0</span></div>
+        <div class="stat">🥚 بيض: <span id="eggs">0</span></div>
+        <div class="stat">⭐ المستوى: <span id="lvl">1</span></div>
     </div>
 
-    <div id="game-ui" class="hidden" style="display:contents;">
-        <div class="header">
-            <div class="stat">💰 ذهب: <span id="gold-val">0</span></div>
-            <div class="stat">🥚 بيض: <span id="egg-val">0</span></div>
-            <div class="stat">🍯 عسل: <span id="honey-val">0</span></div>
-            <div class="stat">⭐ المستوى: <span id="lvl-val">1</span></div>
+    <div class="game-body">
+        <div class="side-menu">
+            <h3 style="text-align:center; color:#004D40;">قائمة اللاعبين</h3>
+            <div class="player-card">اشلي (متصل)</div>
+            <div class="player-card">اهواز (متصل)</div>
+            <div class="player-card">أعان (متصل)</div>
+            <button class="btn-buy" onclick="buyChicken()">شراء دجاجة (200💰)</button>
         </div>
 
-        <div class="main-game">
-            <div class="side-menu">
-                <h3>اللاعبون</h3>
-                <div class="player-tag">أحمد (متصل) 🟢</div>
-                <div class="player-tag">سارة (متصل) 🟢</div>
-                <div class="player-tag">علي (متصل) 🟢</div>
-                <div style="margin-top:auto;">
-                    <button class="btn btn-buy" style="width:100%;" onclick="openShop()">🛒 المتجر</button>
-                </div>
-            </div>
-
-            <div class="farm-area">
-                <h3 style="color:#fff; text-shadow: 2px 2px #000;">🌱 منطقة الزراعة (نمو 3 دقائق)</h3>
-                <div class="crop-grid" id="grid"></div>
-
-                <div class="animal-pen" id="pen">
-                    </div>
-            </div>
-        </div>
-
-        <div class="footer-btns">
-            <button class="btn btn-sell" onclick="collectAndSell()">💰 إيعان (بيع المحاصيل والبيض)</button>
+        <div class="farm-world" id="world">
+            <h3 style="color:white; text-shadow: 2px 2px #000;">🌾 حقل الزراعة (3 دقائق للنمو)</h3>
+            <div class="grid" id="grid"></div>
+            
+            <button class="btn-collect" onclick="collectAll()">إيعان (جمع وبيع)</button>
         </div>
     </div>
+</div>
 
-    <div id="shop" class="overlay hidden" onclick="this.classList.add('hidden')">
-        <div class="login-box" onclick="event.stopPropagation()">
-            <h3>🛒 متجر المزرعة</h3>
-            <div style="display:flex; gap:20px;">
-                <div onclick="buy('chicken', 200)">🐥 دجاجة<br>200💰</div>
-                <div onclick="buy('bee', 1000)">🐝 خلية نحل<br>1000💰</div>
-                <div onclick="buy('cow', 800)">🐄 بقرة<br>800💰</div>
-            </div><br>
-            <button class="btn btn-sell" onclick="document.getElementById('shop').classList.add('hidden')">إغلاق</button>
-        </div>
-    </div>
+<script>
+    let farm = { gold: 1000, eggs: 0, crops: 0, chickens: 0 };
+    // رابط صورة الدجاجة الواقعية التي أرسلتها
+    const CHICKEN_IMG = "https://m.media-amazon.com/images/I/41-N7X0-1lL._AC_.jpg";
 
-    <script>
-        let farm = { user: "", gold: 1000, eggs: 0, honey: 0, inv: 0, animals: [] };
+    function start() {
+        let n = document.getElementById('user').value;
+        if(!n) return;
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        initGrid();
+        setInterval(moveChickens, 4000);
+        setInterval(() => { if(farm.chickens > 0) farm.eggs += farm.chickens; updateUI(); }, 10000);
+    }
 
-        function start() {
-            let u = document.getElementById('username').value.trim();
-            if(!u) return;
-            farm.user = u;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('game-ui').classList.remove('hidden');
-            initGrid();
-            setInterval(moveAnimals, 4000);
-            setInterval(produce, 10000); // إنتاج كل 10 ثواني
-            updateUI();
+    function initGrid() {
+        const g = document.getElementById('grid');
+        for(let i=0; i<12; i++) {
+            let p = document.createElement('div');
+            p.className = 'plot';
+            p.onclick = () => plant(p);
+            g.appendChild(p);
         }
+    }
 
-        function initGrid() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = "";
-            for(let i=0; i<12; i++) {
-                let p = document.createElement('div');
-                p.className = 'plot';
-                p.onclick = () => plant(p);
-                grid.appendChild(p);
-            }
+    function plant(p) {
+        if(p.innerHTML === "") {
+            p.innerHTML = "🌱";
+            let time = 180;
+            let t = document.createElement('div');
+            t.className = 'timer';
+            p.appendChild(t);
+
+            let count = setInterval(() => {
+                time--;
+                let m = Math.floor(time/60), s = time%60;
+                t.innerText = `${m}:${s<10?'0'+s:s}`;
+                if(time <= 0) {
+                    clearInterval(count);
+                    p.innerHTML = "🌾";
+                    p.onclick = () => { farm.crops++; p.innerHTML = ""; p.onclick = () => plant(p); updateUI(); };
+                }
+            }, 1000);
         }
+    }
 
-        function plant(p) {
-            if(p.innerHTML === "") {
-                p.innerHTML = "🌱";
-                let timeLeft = 180; // 3 دقائق
-                let timer = document.createElement('span');
-                timer.className = 'timer';
-                p.appendChild(timer);
-
-                let count = setInterval(() => {
-                    timeLeft--;
-                    let mins = Math.floor(timeLeft/60);
-                    let secs = timeLeft%60;
-                    timer.innerText = `${mins}:${secs < 10 ? '0'+secs : secs}`;
-                    
-                    if(timeLeft <= 0) {
-                        clearInterval(count);
-                        p.innerHTML = "🌿"; // برسيم نضج
-                        p.onclick = () => {
-                            farm.inv++;
-                            p.innerHTML = "";
-                            p.onclick = () => plant(p);
-                            updateUI();
-                        };
-                    }
-                }, 1000);
-            }
-        }
-
-        function buy(type, price) {
-            if(farm.gold >= price) {
-                farm.gold -= price;
-                farm.animals.push(type);
-                renderAnimal(type);
-                updateUI();
-                alert("تم الشراء!");
-            } else { alert("الذهب لا يكفي!"); }
-        }
-
-        function renderAnimal(type) {
+    function buyChicken() {
+        if(farm.gold >= 200) {
+            farm.gold -= 200;
+            farm.chickens++;
             let img = document.createElement('img');
-            img.className = 'moving-animal';
-            img.src = (type === 'chicken') ? 'https://i.ibb.co/4pMym7Q/chicken-walk.gif' : 
-                      (type === 'cow') ? 'https://i.ibb.co/r76k84M/cow-walk.gif' : 'https://i.ibb.co/2S46Vq1/bee-hive.png';
+            img.src = CHICKEN_IMG;
+            img.className = 'chicken';
             img.style.left = "50%"; img.style.top = "50%";
-            document.getElementById('pen').appendChild(img);
-        }
-
-        function moveAnimals() {
-            let anims = document.getElementsByClassName('moving-animal');
-            for(let a of anims) {
-                a.style.left = Math.random() * 80 + "%";
-                a.style.top = Math.random() * 60 + "%";
-            }
-        }
-
-        function produce() {
-            farm.animals.forEach(a => {
-                if(a === 'chicken') farm.eggs++;
-                if(a === 'bee') farm.honey++;
-            });
+            document.getElementById('world').appendChild(img);
             updateUI();
-        }
+        } else alert("الذهب لا يكفي!");
+    }
 
-        function collectAndSell() {
-            let profit = (farm.inv * 50) + (farm.eggs * 20) + (farm.honey * 100);
-            if(profit > 0) {
-                farm.gold += profit;
-                farm.inv = 0; farm.eggs = 0; farm.honey = 0;
-                updateUI();
-                alert("تم جمع المحاصيل والإنتاج! الربح: " + profit + " 💰");
-            } else { alert("لا يوجد شيء لجمعه الآن!"); }
+    function moveChickens() {
+        let imgs = document.getElementsByClassName('chicken');
+        for(let i of imgs) {
+            i.style.left = Math.random() * 80 + "%";
+            i.style.top = Math.random() * 60 + 20 + "%";
         }
+    }
 
-        function openShop() { document.getElementById('shop').classList.remove('hidden'); }
-
-        function updateUI() {
-            document.getElementById('gold-val').innerText = farm.gold;
-            document.getElementById('egg-val').innerText = farm.eggs;
-            document.getElementById('honey-val').innerText = farm.honey;
-            document.getElementById('lvl-val').innerText = Math.floor(farm.gold / 2000) + 1;
+    function collectAll() {
+        let total = (farm.eggs * 20) + (farm.crops * 50);
+        if(total > 0) {
+            farm.gold += total;
+            farm.eggs = 0; farm.crops = 0;
+            updateUI();
+            alert("تم بيع الإنتاج وربحت " + total + " 💰");
         }
-    </script>
+    }
+
+    function updateUI() {
+        document.getElementById('gold').innerText = farm.gold;
+        document.getElementById('eggs').innerText = farm.eggs;
+        document.getElementById('lvl').innerText = Math.floor(farm.gold / 2000) + 1;
+    }
+</script>
 </body>
 </html>
