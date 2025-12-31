@@ -1,195 +1,138 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>مزرعة الأساطير - نظام شراء الأراضي</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        
-        body { background: #1b5e20; height: 100vh; overflow: hidden; display: flex; flex-direction: column; color: white; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لعبة المزرعة</title>
 
-        /* HUD - العدادات العلوية */
-        .hud {
-            height: 70px; background: rgba(0,0,0,0.85); display: flex;
-            justify-content: space-around; align-items: center; border-bottom: 3px solid #ffd700;
-        }
-        .stat { background: #fff; color: #2e7d32; padding: 5px 15px; border-radius: 10px; border: 2px solid #ffd700; font-weight: 900; min-width: 110px; text-align: center; font-size: 13px; }
-        
-        .xp-box { text-align: center; width: 220px; }
-        .xp-bg { width: 100%; height: 10px; background: #333; border-radius: 10px; overflow: hidden; margin-top: 5px; }
-        .xp-bar { width: 0%; height: 100%; background: #00bcd4; transition: 0.4s; }
-
-        /* منطقة المزرعة */
-        .farm-world { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(#4caf50, #1b5e20); }
-        .grid {
-            display: grid; grid-template-columns: repeat(6, 110px); gap: 10px;
-            padding: 20px; background: rgba(0,0,0,0.2); border-radius: 20px; border: 4px solid #3e2723;
-        }
-        
-        .soil {
-            width: 110px; height: 110px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; position: relative; transition: 0.3s;
-        }
-        .unlocked { background: #6d4c41; border: 3px solid #3e2723; cursor: pointer; }
-        .locked { background: rgba(0,0,0,0.4); border: 2px dashed #fff; opacity: 0.3; cursor: not-allowed; }
-
-        /* المتجر الجانبي */
-        .side-shop { 
-            position: fixed; right: 10px; top: 80px; bottom: 100px; width: 210px; 
-            background: rgba(255,255,255,0.95); padding: 15px; border-radius: 20px; 
-            border: 3px solid #2e7d32; color: #333; display: flex; flex-direction: column; gap: 10px;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-        }
-        .shop-btn {
-            width: 100%; padding: 12px; border: none; border-radius: 12px; 
-            cursor: pointer; font-weight: 900; font-family: 'Cairo'; font-size: 13px;
-            color: white; transition: 0.2s;
-        }
-        .b-seed { background: #ff9800; box-shadow: 0 4px #e65100; }
-        .b-expand { background: #9c27b0; box-shadow: 0 4px #7b1fa2; }
-        .b-sell { background: #2196f3; box-shadow: 0 4px #1976d2; margin-top: auto; }
-        .shop-btn:active { transform: translateY(2px); box-shadow: none; }
-        .shop-btn:disabled { background: #bbb !important; cursor: not-allowed; box-shadow: none; }
-
-        /* المحادثة السفلية */
-        .chat-area { 
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
-            width: 400px; background: rgba(0,0,0,0.85); padding: 10px; 
-            border-radius: 15px 15px 0 0; border: 1px solid #ffd700;
-        }
-        #logs { height: 40px; overflow-y: auto; font-size: 12px; color: #eee; margin-bottom: 5px; }
-    </style>
+<style>
+body{font-family:tahoma;margin:0;background:#4caf50;text-align:center}
+.box{background:#fff;padding:15px;margin:20px;border-radius:12px}
+input,button{padding:10px;margin:5px;font-size:16px;border-radius:8px}
+.farm{display:grid;grid-template-columns:repeat(5,60px);gap:6px;justify-content:center}
+.plot{width:60px;height:60px;background:#6d4c41;color:white;font-size:26px;
+display:flex;align-items:center;justify-content:center;border-radius:8px}
+.top{background:#795548;color:white;padding:10px}
+.hidden{display:none}
+.chat{background:#eee;height:120px;overflow:auto;margin:10px;padding:5px}
+</style>
 </head>
+
 <body>
 
-    <div class="hud">
-        <div class="stat">💰 الذهب: <span id="gold">1000</span></div>
-        <div class="xp-box">
-            <div style="color:#ffd700; font-size:12px;">⭐ مستوى <span id="lvl">1</span></div>
-            <div class="xp-bg"><div class="xp-bar" id="xp-bar"></div></div>
-        </div>
-        <div class="stat">🌱 بذور: <span id="seeds">10</span></div>
-        <div class="stat">🌾 مخزن: <span id="inv">0</span></div>
-    </div>
+<div id="loginBox" class="box">
+<h2>تسجيل الدخول</h2>
+<input id="user" placeholder="اسم المستخدم"><br>
+<input id="pass" type="password" placeholder="كلمة المرور"><br>
+<button onclick="login()">دخول / تسجيل</button>
+</div>
 
-    <div class="side-shop">
-        <h3 style="text-align: center; color: #2e7d32;">🛒 المتجر</h3>
-        <button class="shop-btn b-seed" onclick="buySeeds()">🌱 بذور (50💰)</button>
-        
-        <button id="btn-expand" class="shop-btn b-expand" onclick="expandFarm()">
-            🏗️ شراء أرض جديدة 
-            <div style="font-size: 10px; font-weight: normal;" id="expand-cost">2000💰</div>
-        </button>
+<div id="game" class="hidden">
+<div class="top">
+👤 <span id="player"></span> |
+💰 <span id="money">0</span>
+<button onclick="logout()">خروج</button>
+</div>
 
-        <button class="shop-btn b-sell" onclick="sellAll()">💰 بيع كل المحصول</button>
-        <p style="font-size: 10px; text-align: center; color: #666;" id="land-count">الأراضي المفتوحة: 6/24</p>
-    </div>
+<div class="farm" id="farm"></div>
 
-    <div class="farm-world">
-        <div class="grid" id="grid"></div>
-    </div>
+<button onclick="plant()">🌱 زرع</button>
+<button onclick="harvest()">🌾 حصاد</button>
 
-    <div class="chat-area">
-        <div id="logs"><div><b>النظام:</b> ابدأ بـ 6 قطع أرض، واشترِ المزيد من المتجر!</div></div>
-    </div>
+<div class="box">
+<h3>🐄 الحيوانات</h3>
+🐄 بقرة | 🐑 خروف | 🐔 دجاجة | 🐎 حصان
+</div>
+
+<div class="box">
+<h3>💬 محادثة الأصدقاء</h3>
+<div class="chat" id="chat"></div>
+<input id="msg" placeholder="اكتب رسالة">
+<button onclick="send()">إرسال</button>
+</div>
+</div>
 
 <script>
-    // البيانات: تبدأ بـ 6 قطع أرض مفتوحة
-    let farm = JSON.parse(localStorage.getItem('farm_land_system')) || { 
-        gold: 1000, seeds: 10, inv: 0, xp: 0, lvl: 1, unlockedPlots: 6 
-    };
+let currentUser="";
+let selected=null;
+let data={money:50,farm:Array(25).fill("")};
 
-    function update() {
-        document.getElementById('gold').innerText = farm.gold;
-        document.getElementById('seeds').innerText = farm.seeds;
-        document.getElementById('inv').innerText = farm.inv;
-        document.getElementById('lvl').innerText = farm.lvl;
-        document.getElementById('land-count').innerText = `الأراضي المفتوحة: ${farm.unlockedPlots}/24`;
-        
-        // حساب سعر التوسع: يبدأ من 2000 ويزداد بمقدار 1000 لكل قطعة
-        let expandCost = 2000 + (farm.unlockedPlots - 6) * 1000;
-        document.getElementById('expand-cost').innerText = `${expandCost}💰`;
-        
-        // شريط المستوى
-        let nextXp = farm.lvl * 500;
-        document.getElementById('xp-bar').style.width = (farm.xp / nextXp * 100) + "%";
+function login(){
+let u=user.value,p=pass.value;
+if(!u||!p)return;
+currentUser=u;
+let saved=localStorage.getItem("farm_"+u);
+if(saved)data=JSON.parse(saved);
+player.innerText=u;
+money.innerText=data.money;
+loginBox.classList.add("hidden");
+game.classList.remove("hidden");
+drawFarm();
+loadChat();
+}
 
-        // حالة الأزرار
-        document.getElementById('btn-expand').disabled = (farm.gold < expandCost || farm.unlockedPlots >= 24);
-        
-        localStorage.setItem('farm_land_system', JSON.stringify(farm));
-    }
+function logout(){
+save();
+location.reload();
+}
 
-    // بناء الشبكة (24 قطعة إجمالية)
-    function drawGrid() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = "";
-        for(let i=0; i<24; i++) {
-            let s = document.createElement('div');
-            if(i < farm.unlockedPlots) {
-                s.className = "soil unlocked";
-                s.onclick = () => handleSoil(s);
-            } else {
-                s.className = "soil locked";
-                s.innerHTML = "🔒";
-            }
-            grid.appendChild(s);
-        }
-    }
+function save(){
+localStorage.setItem("farm_"+currentUser,JSON.stringify(data));
+}
 
-    function handleSoil(s) {
-        if(s.innerHTML === "" && farm.seeds > 0) {
-            farm.seeds--; s.innerHTML = "🌱"; update();
-            setTimeout(() => { s.innerHTML = "🌾"; }, 3000);
-        } else if(s.innerHTML === "🌾") {
-            s.innerHTML = ""; farm.inv++; farm.xp += 50;
-            checkLvl(); update();
-        }
-    }
+function drawFarm(){
+farm.innerHTML="";
+data.farm.forEach((v,i)=>{
+let d=document.createElement("div");
+d.className="plot";
+d.innerText=v;
+d.onclick=()=>selected=i;
+farm.appendChild(d);
+});
+}
 
-    function expandFarm() {
-        let expandCost = 2000 + (farm.unlockedPlots - 6) * 1000;
-        if(farm.gold >= expandCost) {
-            farm.gold -= expandCost;
-            farm.unlockedPlots++;
-            drawGrid();
-            update();
-            log("المتجر", "تم شراء قطعة أرض جديدة بنجاح!");
-        }
-    }
+function plant(){
+if(selected===null)return;
+if(data.farm[selected]===""){
+data.farm[selected]="🌱";
+data.money-=2;
+update();
+setTimeout(()=>{
+if(data.farm[selected]==="🌱"){
+data.farm[selected]="🌾";
+drawFarm();save();
+}},4000);
+}
+}
 
-    function buySeeds() {
-        if(farm.gold >= 50) { farm.gold -= 50; farm.seeds += 5; update(); }
-    }
+function harvest(){
+if(selected===null)return;
+if(data.farm[selected]==="🌾"){
+data.farm[selected]="";
+data.money+=5;
+update();
+}
+}
 
-    function sellAll() {
-        if(farm.inv > 0) {
-            let money = farm.inv * 100;
-            farm.gold += money; farm.inv = 0;
-            update();
-            log("المتجر", `بعت المحصول بـ ${money} ذهبة.`);
-        }
-    }
+function update(){
+money.innerText=data.money;
+drawFarm();save();
+}
 
-    function checkLvl() {
-        if(farm.xp >= (farm.lvl * 500)) {
-            farm.lvl++; farm.xp = 0; farm.gold += 1000;
-            update();
-            alert(`⭐ مبروك الوصول للمستوى ${farm.lvl}! حصلت على مكافأة 1000 ذهبة.`);
-        }
-    }
+/* ====== الشات ====== */
+function loadChat(){
+chat.innerHTML=localStorage.getItem("chat")||"";
+}
 
-    function log(u, m) {
-        let c = document.getElementById('logs');
-        c.innerHTML += `<div><b>${u}:</b> ${m}</div>`;
-        c.scrollTop = c.scrollHeight;
-    }
-
-    // التشغيل
-    drawGrid();
-    update();
+function send(){
+let text=msg.value;
+if(!text)return;
+let line=`<div><b>${currentUser}:</b> ${text}</div>`;
+chat.innerHTML+=line;
+localStorage.setItem("chat",chat.innerHTML);
+msg.value="";
+}
 </script>
+
 </body>
 </html>
