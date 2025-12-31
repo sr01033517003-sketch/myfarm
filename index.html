@@ -1,155 +1,178 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مزرعتي</title>
-
+<title>مزرعتي - الإمبراطورية الصناعية</title>
 <style>
-body{
-margin:0;
-font-family:tahoma;
-background:#2e7d32;
-color:white;
-text-align:center;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
+    body{ margin:0; font-family: 'Cairo', sans-serif; background:#3e2723; color:white; text-align:center; padding-bottom: 200px;}
 
-.top{
-background:#1b5e20;
-padding:10px;
-font-size:18px;
-display:flex;
-justify-content:space-around;
-align-items:center;
-}
+    .top{ background:#1b5e20; padding:15px; font-size:14px; display:flex; justify-content:space-around; align-items:center; border-bottom: 3px solid #ffd700; position: sticky; top: 0; z-index: 100;}
+    .stat-item { background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 10px; border: 1px solid #ffd700; }
 
-.farm{
-background:#4caf50;
-margin:15px auto;
-padding:15px;
-border-radius:15px;
-display:grid;
-grid-template-columns:repeat(3,90px);
-gap:10px;
-width:max-content;
-}
+    .farm-section { background:#4caf50; padding:15px; border-radius:15px; margin: 10px auto; width:max-content; border: 4px solid #2e7d32; }
+    .farm{ display:grid; grid-template-columns:repeat(3,90px); gap:8px; }
+    
+    .plot{ width:90px; height:90px; background:#795548; border-radius:12px; font-size:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid #5d4037; }
+    .plot.selected { border: 3px solid white; box-shadow: 0 0 10px white; }
 
-.plot{
-width:90px;
-height:90px;
-background:#795548;
-border-radius:12px;
-font-size:32px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-}
+    /* قسم المصنع */
+    .factory-section { background: #5d4037; margin: 15px auto; padding: 15px; border-radius: 20px; width: 90%; border: 3px solid #d7ccc8; }
+    .factory-grid { display: flex; justify-content: space-around; gap: 10px; }
+    .machine { background: #3e2723; padding: 10px; border-radius: 15px; flex: 1; border: 2px solid #ffd700; }
+    
+    .inventory-bar { background: #efebe9; color: #333; padding: 8px; margin: 10px auto; width: 90%; border-radius: 10px; font-size: 12px; display: flex; justify-content: space-around; font-weight: bold;}
 
-.controls button{
-margin:5px;
-padding:10px 14px;
-font-size:16px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-}
-
-.plant{background:#66bb6a}
-.harvest{background:#ffb300}
-.shop{background:#6d4c41;color:white}
-
-.box{
-background:#ffffff22;
-margin:10px;
-padding:10px;
-border-radius:12px;
-}
+    .controls { background: rgba(0,0,0,0.9); padding: 15px; position: fixed; bottom: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 200; border-top: 3px solid #ffd700; }
+    .btn-row { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+    
+    .btn { padding: 10px 14px; border: none; border-radius: 10px; cursor: pointer; font-family: Cairo; font-weight: bold; color: white; font-size: 12px; transition: 0.2s; }
+    .btn-factory { background: #f57c00; width: 100%; margin-top: 5px; }
+    .btn-sell { background: #00bcd4; width: 90%; }
 </style>
 </head>
-
 <body>
 
 <div class="top">
-💰 <span id="money">100</span>
-👤 <span id="user">لاعب</span>
+    <div class="stat-item">💰 <span id="money">0</span></div>
+    <div class="stat-item">🥖 خبز: <span id="bread-count">0</span></div>
+    <div class="stat-item">🥫 صلصة: <span id="sauce-count">0</span></div>
 </div>
 
-<div class="farm" id="farm"></div>
+<div class="inventory-bar">
+    <span>🌾 القمح: <span id="wheat-inv">0</span></span>
+    <span>🍅 الطماطم: <span id="tomato-inv">0</span></span>
+</div>
+
+<div class="farm-section">
+    <div class="farm" id="farm"></div>
+</div>
+
+<div class="factory-section">
+    <h3 style="font-size: 16px; margin-bottom: 10px;">🏭 منطقة المصانع</h3>
+    <div class="factory-grid">
+        <div class="machine">
+            🥖 المخبز<br>
+            <button class="btn btn-factory" onclick="craft('bread')">اصنع (3 قمح)</button>
+        </div>
+        <div class="machine">
+            🥫 المعصرة<br>
+            <button class="btn btn-factory" onclick="craft('sauce')">اصنع (2 طماطم)</button>
+        </div>
+    </div>
+</div>
 
 <div class="controls">
-<button class="plant" onclick="plant()">🌱 زرع</button>
-<button class="harvest" onclick="harvest()">🌾 حصاد</button>
-<button class="shop" onclick="buyLand()">🛒 توسيع الأرض (50)</button>
-</div>
-
-<div class="box">
-🐄 بقرة | 🐑 خروف | 🐔 دجاجة | 🐎 حصان  
-<br> (قريبًا إنتاج وربح)
+    <div class="btn-row">
+        <button class="btn" style="background:#43a047" onclick="plant('wheat')">🌾 زرع قمح</button>
+        <button class="btn" style="background:#e53935" onclick="plant('tomato')">🍅 زرع طماطم</button>
+        <button class="btn" style="background:#fb8c00" onclick="harvest()">🧺 حصاد</button>
+        <button class="btn" style="background:#6d4c41" onclick="buyLand()">🛒 توسيع (50)</button>
+    </div>
+    <button onclick="sellProducts()" class="btn btn-sell">💰 بيع المنتجات المصنعة (أرباح خيالية)</button>
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("farmData")) || {
-money:100,
-land:6,
-plots:Array(6).fill("")
+let data = JSON.parse(localStorage.getItem("farmDataV9")) || {
+    money: 100,
+    land: 6,
+    plots: Array(6).fill({type: "", stage: ""}),
+    inv: { wheat: 0, tomato: 0 },
+    prods: { bread: 0, sauce: 0 }
 };
 
-let selected=null;
+let selected = null;
 
-function save(){
-localStorage.setItem("farmData",JSON.stringify(data));
-}
+function save() { localStorage.setItem("farmDataV9", JSON.stringify(data)); }
 
-function draw(){
-money.innerText=data.money;
-farm.innerHTML="";
-for(let i=0;i<data.land;i++){
-let d=document.createElement("div");
-d.className="plot";
-d.innerText=data.plots[i]||"";
-d.onclick=()=>selected=i;
-farm.appendChild(d);
-}
-save();
-}
+function draw() {
+    document.getElementById("money").innerText = Math.floor(data.money);
+    document.getElementById("wheat-inv").innerText = data.inv.wheat;
+    document.getElementById("tomato-inv").innerText = data.inv.tomato;
+    document.getElementById("bread-count").innerText = data.prods.bread;
+    document.getElementById("sauce-count").innerText = data.prods.sauce;
 
-function plant(){
-if(selected===null) return;
-if(data.plots[selected]==="" && data.money>=5){
-data.plots[selected]="🌱";
-data.money-=5;
-draw();
-setTimeout(()=>{
-if(data.plots[selected]==="🌱"){
-data.plots[selected]="🌾";
-draw();
-}
-},4000);
-}
+    const farmDiv = document.getElementById("farm");
+    farmDiv.innerHTML = "";
+    farmDiv.style.gridTemplateColumns = `repeat(${data.land > 9 ? 4 : 3}, 90px)`;
+
+    for(let i=0; i<data.land; i++){
+        let d = document.createElement("div");
+        let p = data.plots[i];
+        d.className = "plot" + (selected === i ? " selected" : "");
+        
+        if(p.stage === "growing") d.innerText = "🌱";
+        else if(p.stage === "ready") d.innerText = p.type === "wheat" ? "🌾" : "🍅";
+
+        d.onclick = () => { selected = i; draw(); };
+        farmDiv.appendChild(d);
+    }
+    save();
 }
 
-function harvest(){
-if(selected===null) return;
-if(data.plots[selected]==="🌾"){
-data.plots[selected]="";
-data.money+=15;
-draw();
-}
+function plant(type) {
+    if(selected === null || data.plots[selected].stage !== "") return;
+    let cost = type === "wheat" ? 5 : 15;
+    if(data.money >= cost) {
+        data.money -= cost;
+        data.plots[selected] = { type: type, stage: "growing" };
+        draw();
+        let p = selected;
+        setTimeout(() => {
+            if(data.plots[p].stage === "growing") {
+                data.plots[p].stage = "ready";
+                draw();
+            }
+        }, type === "wheat" ? 3000 : 7000);
+    }
 }
 
-function buyLand(){
-let cost=50;
-if(data.money>=cost){
-data.money-=cost;
-data.land++;
-data.plots.push("");
-draw();
+function harvest() {
+    if(selected !== null && data.plots[selected].stage === "ready") {
+        data.inv[data.plots[selected].type]++;
+        data.plots[selected] = {type: "", stage: ""};
+        draw();
+    }
 }
+
+function craft(prod) {
+    if(prod === 'bread' && data.inv.wheat >= 3) {
+        data.inv.wheat -= 3;
+        data.prods.bread++;
+        alert("🥖 تم خبز رغيف فاخر!");
+    } else if(prod === 'sauce' && data.inv.tomato >= 2) {
+        data.inv.tomato -= 2;
+        data.prods.sauce++;
+        alert("🥫 تم صنع صلصة سرية!");
+    } else {
+        alert("لا تملك مواد خام كافية!");
+    }
+    draw();
+}
+
+function sellProducts() {
+    let total = (data.prods.bread * 150) + (data.prods.sauce * 200);
+    if(total > 0) {
+        data.money += total;
+        data.prods = { bread: 0, sauce: 0 };
+        alert(`💰 مبروك! بعت المنتجات بـ ${total} ذهبة!`);
+        draw();
+    } else {
+        alert("لم تصنع شيئاً لبيعه بعد!");
+    }
+}
+
+function buyLand() {
+    if(data.money >= 50) {
+        data.money -= 50;
+        data.land++;
+        data.plots.push({type: "", stage: ""});
+        draw();
+    }
 }
 
 draw();
 </script>
-
 </body>
 </html>
